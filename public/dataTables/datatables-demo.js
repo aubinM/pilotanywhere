@@ -36,6 +36,7 @@ $(document).ready(function () {
             }
         }
         },
+        "bDeferRender": true,
         fixedHeader: {
             header: true,
             headerOffset: -10
@@ -66,7 +67,10 @@ $(document).ready(function () {
             'selectAll',
             'selectNone'
         ],
-        "lengthMenu": [10, 25, 50, 75, 100]
+        "lengthMenu": [25, 10, 50, 75, 100],
+        scrollY:        400,
+        scrollCollapse: true,
+        scroller:       true
 
 
     });

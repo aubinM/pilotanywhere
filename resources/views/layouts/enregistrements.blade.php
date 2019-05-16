@@ -92,6 +92,7 @@
                                                     <th class="small font-weight-bold">Test delta Pression</th>
                                                     <th class="small font-weight-bold">Validation globale</th>
                                                     <th class="small font-weight-bold">Alarme</th>
+                                                    
                                                     <th class="small font-weight-bold">Check</th>
                                                     <th class="small font-weight-bold">Commentaires</th>
                                                 </tr>
@@ -99,9 +100,9 @@
                                             <tbody>
                                                 @for ($i = 0; $i < 150; $i++)
                                                 <tr>
-                                                    <td><a href="#" class="text-primary">n°1</a></td>
+                                                    <td><a href="{{route('syntheses', $i)}}" class="text-primary">{{$i}}</a></td>
                                                     <td>Pasto stand</td>
-                                                    <td>n°8</td>
+                                                    <td>{{$i}}</td>
                                                     <td>13/05/2019</td>
                                                     <td>14/05/2019</td>
                                                     <td>1 jour</td>

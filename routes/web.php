@@ -14,5 +14,6 @@
 
 Auth::routes();
 
-Route::get('/', 'HomeController@index')->name('index');
-Route::get('/enregistrements','RecordsController@index')->name('enregistrements');
+Route::get('/', 'HomeController@index')->name('index')->middleware('auth');;
+Route::get('/enregistrements','RecordsController@index')->name('enregistrements')->middleware('auth');;
+Route::get('/syntheses/{id}','SynthesisController@index')->name('syntheses')->middleware('auth');;
