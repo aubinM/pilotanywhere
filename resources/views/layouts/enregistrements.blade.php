@@ -57,7 +57,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @for ($i = 0; $i < 100; $i++)
+                                            @for ($i = 0; $i < 150; $i++)
                                             <tr>
                                                 <td><a href="#" class="text-primary">n°1</a></td>
                                                 <td>Pasto stand</td>
