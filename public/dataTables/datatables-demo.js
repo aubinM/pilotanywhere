@@ -23,12 +23,51 @@ $(document).ready(function () {
             "oAria": {
                 "sSortAscending": ": activer pour trier la colonne par ordre croissant",
                 "sSortDescending": ": activer pour trier la colonne par ordre d&eacute;croissant"
+            },
+            buttons: {
+                selectAll: "Tout séléctionné",
+                selectNone: "Tout Désélectionné"
+            },
+            select: {
+            rows: {
+                _: "%d lignes séléctionnées",
+                0: "Cliquer sur une ligne pour séléctionné",
+                1: "1 ligne séléctionnée"
             }
+        }
         },
         fixedHeader: {
             header: true,
             headerOffset: -10
-        }
+        },
+        select: {
+            style: 'multiple'
+        },
+        colReorder: true,
+
+        "dom": "<'row'<'col-md-5'B><'col-md-3'l><'col-md-4'f>><'row'<'col-md-12't>><'row'<'col-md-3'i><'col-md-6'><'col-md-3'p>>",
+        buttons: [
+            {
+                extend: 'pdfHtml5',
+                orientation: 'landscape',
+                pageSize: 'LEGAL',
+                exportOptions: {
+                    rows: {selected: true}
+                }
+            },
+            'csv',
+            'excel',
+            {
+                text: "Selection page",
+                action: function (e, dt, button, config) {
+                    dt.rows({page: 'current'}).select();
+                }
+            },
+            'selectAll',
+            'selectNone'
+        ],
+        "lengthMenu": [10, 25, 50, 75, 100]
+
 
     });
 });

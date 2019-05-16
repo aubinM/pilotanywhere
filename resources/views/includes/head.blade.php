@@ -20,10 +20,12 @@
         <link href="/css/sb-admin-2.min.css" rel="stylesheet">
 
         <!-- Custom styles for DataTables-->
-        <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+<!--        <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
         <link href="\dataTables\FixedHeader-3.1.4\css\fixedHeader.dataTables.min.css" rel="stylesheet">
         <link href="\dataTables\Responsive-2.2.2\css\responsive.dataTables.min.css" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="/DataTables/datatables.min.css"/>
+        <link href="\dataTables\ColReorder-1.5.0\css\colReorder.dataTables.min.css" rel="stylesheet">
+        <link href="\dataTables\Select-1.3.0\css\select.dataTables.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/DataTables/datatables.min.css"/>-->
 
 
         <!--<link href="{{ asset('/css/bootstrap.min.css') }}" rel="stylesheet">-->
