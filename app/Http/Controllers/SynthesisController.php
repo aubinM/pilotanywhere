@@ -13,8 +13,10 @@ class SynthesisController extends Controller
      */
     public function index()
     {
+
         return view('layouts.syntheses');
        
+
     }
 
     /**
@@ -46,7 +48,9 @@ class SynthesisController extends Controller
      */
     public function show($id)
     {
+
          return view('layouts.syntheses', compact('id'));
+
     }
 
     /**

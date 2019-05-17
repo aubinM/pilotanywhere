@@ -17,6 +17,7 @@ Route::get('/', 'HomeController@index')->name('index')->middleware('auth');
 Route::get('/enregistrements','RecordsController@index')->name('enregistrements')->middleware('auth');
 
 
+
 Route::group(['middleware' => 'auth'], function() {
         Route::resource('syntheses', 'SynthesisController', ['names' => [
             'index' => 'syntheses.index',

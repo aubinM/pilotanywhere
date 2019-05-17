@@ -5,10 +5,13 @@
         <group>
             <file>file:/C:/xampp/htdocs/cipanywhere/resources/views/includes/bottom_scripts.blade.php</file>
             <file>file:/C:/xampp/htdocs/cipanywhere/resources/views/includes/head.blade.php</file>
-            <file>file:/C:/xampp/htdocs/cipanywhere/resources/views/includes/all.blade.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/routes/web.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/app/Http/Controllers/SynthesisController.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/resources/views/layouts/syntheses.blade.php</file>
             <file>file:/C:/xampp/htdocs/cipanywhere/resources/views/layouts/enregistrements.blade.php</file>
             <file>file:/C:/xampp/htdocs/cipanywhere/public/dataTables/datatables-demo.js</file>
             <file>file:/C:/xampp/htdocs/cipanywhere/resources/views/index.blade.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/resources/views/includes/sidebar.blade.php</file>
         </group>
     </open-files>
 </project-private>
