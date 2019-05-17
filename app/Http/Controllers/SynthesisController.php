@@ -11,10 +11,11 @@ class SynthesisController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($id)
+    public function index()
     {
+        $id;
+        return view('layouts.syntheses');
         
-        return view('layouts.syntheses', compact('id'));
     }
 
     /**
@@ -46,7 +47,7 @@ class SynthesisController extends Controller
      */
     public function show($id)
     {
-        //
+        return view('layouts.syntheses', compact('id'));
     }
 
     /**
