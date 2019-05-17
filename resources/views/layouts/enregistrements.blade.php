@@ -98,9 +98,9 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @for ($i = 0; $i < 150; $i++)
+                                                @for ($i = 1; $i <= 150; $i++)
                                                 <tr>
-                                                    <td><a href="{{route('syntheses', $i)}}" class="text-primary">{{$i}}</a></td>
+                                                    <td><a href="{{route('syntheses.show', $i)}}" class="text-primary">{{$i}}</a></td>
                                                     <td>Pasto stand</td>
                                                     <td>{{$i}}</td>
                                                     <td>13/05/2019</td>

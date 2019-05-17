@@ -13,7 +13,14 @@
 
 
 Auth::routes();
+Route::get('/', 'HomeController@index')->name('index')->middleware('auth');
+Route::get('/enregistrements','RecordsController@index')->name('enregistrements')->middleware('auth');
 
-Route::get('/', 'HomeController@index')->name('index')->middleware('auth');;
-Route::get('/enregistrements','RecordsController@index')->name('enregistrements')->middleware('auth');;
-Route::get('/syntheses/{id}','SynthesisController@index')->name('syntheses')->middleware('auth');;
+
+Route::group(['middleware' => 'auth'], function() {
+        Route::resource('syntheses', 'SynthesisController', ['names' => [
+            'index' => 'syntheses.index',
+            'show' => 'syntheses.show'
+    ]]);
+
+});
