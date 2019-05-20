@@ -3,12 +3,17 @@
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
     <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('index') }}">
-        <div class="sidebar-brand-icon ">
-            <i class="fas fa-industry"></i>
+<!--    <a class="sidebar-brand d-flex align-items-center justify-content-center" >-->
+        <div style="margin-top: 2em; margin-bottom: 2em;" class="sidebar-brand d-flex align-items-center justify-content-center">
+            <!--<i class="fas fa-industry"></i>-->
+
+             <a href="{{ route('index') }}"><img src="/images/Logo4-pret-noir2.png" width="100"title="Logo" alt="Logo"></a>
+
         </div>
-        <div class="sidebar-brand-text mx-3">Iaaservices</div>
-    </a>
+        <!--<div class="sidebar-brand-text mx-3">Iaaservices</div>-->
+<!--    </a>
+    -->
+
 
     <!-- Divider -->
     <hr class="sidebar-divider my-0">

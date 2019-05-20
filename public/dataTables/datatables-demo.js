@@ -46,7 +46,7 @@ $(document).ready(function () {
         },
         colReorder: true,
 
-        "dom": "<'row'<'col-md-5'B><'col-md-4'l><'col-md-4'f>><'row'<'col-md-12't>><'row'<'col-md-3'i><'col-md-6'><'col-md-3'p>>",
+        "dom": "<'row'<'col-md-5'B><'col-md-4'l><'col-md-3'f>><'row'<'col-md-12't>><'row'<'col-md-3'i><'col-md-6'><'col-md-3'p>>",
         buttons: [
             {
                 extend: 'pdfHtml5',

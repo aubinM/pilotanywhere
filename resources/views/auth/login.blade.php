@@ -8,8 +8,9 @@
 
         <div class="col-lg-12">
             <div class="p-5">
-                <div class="text-center">
-                    <h1 class="h4 text-gray-900 mb-4">Bienvenue</h1>
+                <div class="text-center"> 
+                    <img src="/images/Logo4-pret-noir2.png" width="200">
+                    <h3 class="h4 text-gray-900 mb-4"></h3>
                 </div>
 
                 <div class="form-group">
