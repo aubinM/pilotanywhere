@@ -13,7 +13,13 @@ class RecordsController extends Controller
      */
     public function index()
     {
-         return view('layouts.enregistrements');
+        
+        $enregistrements = \App\Ca_enregistrement::all();
+        
+        
+        
+//        dd($materiel->materiel_autonome->name);
+         return view('layouts.enregistrements', compact('enregistrements'));
     }
 
     /**

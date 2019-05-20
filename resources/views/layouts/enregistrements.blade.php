@@ -92,26 +92,67 @@
                                                     <th class="small font-weight-bold">Test delta Pression</th>
                                                     <th class="small font-weight-bold">Validation globale</th>
                                                     <th class="small font-weight-bold">Alarme</th>
-                                                    
+
                                                     <th class="small font-weight-bold">Check</th>
                                                     <th class="small font-weight-bold">Commentaires</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @for ($i = 1; $i <= 150; $i++)
+                                                @foreach($enregistrements as $enregistrement)
                                                 <tr>
-                                                    <td><a href="{{route('syntheses.show', $i)}}" class="text-primary">{{$i}}</a></td>
-                                                    <td>Pasto stand</td>
-                                                    <td>{{$i}}</td>
-                                                    <td>13/05/2019</td>
-                                                    <td>14/05/2019</td>
-                                                    <td>1 jour</td>
+                                                    <td><a href="{{route('syntheses.show', $enregistrement->id)}}" class="text-primary">{{$enregistrement->id}}</a></td>
+                                                    <td>{{$enregistrement->materiel_autonome->name}}</td>
+                                                    <td>{{$enregistrement->id}}</td>
+                                                    <td>{{$enregistrement->date_debut}}</td>
+                                                    <td>{{$enregistrement->date_fin}}</td>
+                                                    <td>
+
+                                                        @php
+                                                        $start = Carbon\Carbon::parse($enregistrement->date_debut);
+                                                        $end = Carbon\Carbon::parse($enregistrement->date_fin);
+                                                        $hours = $end->diffInHours($start);
+                                                        $minutes = $end->diffInMinutes($start)%60;
+                                                        $seconds = $end->diffInSeconds($start)%60;
+                                                        @endphp
+                                                        @if($hours > 0)
+                                                        {{$hours . " h" }}<br>
+                                                        @endif
+                                                        @if($minutes > 0)
+                                                        {{$minutes . " m" }}<br>
+                                                        @endif
+                                                        @if($seconds > 0)
+                                                        {{$seconds . " s"}}
+                                                        @endif
+
+                                                        <!--                                                        @php
+                                                                                                                $debut = DateTime::createFromFormat('Y-m-d H:i:s',$enregistrement->date_debut);
+                                                                                                                $fin = DateTime::createFromFormat('Y-m-d H:i:s',$enregistrement->date_fin);
+                                                                           
+                                                                                                                $duree = $debut->diff($fin);
+                                                                                                                $heures = $duree->h;
+                                                                                                                $heures = $heures + ($duree->days*24);
+                                                                                                                $minutes = $duree->i;
+                                                                                                                $minutes = $minutes + ($duree->days*24);;
+                                                                                                                echo $heures
+                                                                                       
+                                                                                   
+                                                                                                            @endphp-->
+                                                    </td>
                                                     <td>250</td>
                                                     <td>ok</td>
                                                     <td>ok</td>
                                                     <td>ok</td>
                                                     <td>ok</td>
-                                                    <td>ok</td>
+                                                    <td>
+
+                                                        @foreach($enregistrement->alarmes as $alarme)
+                                                        {{$alarme->name}}
+                                                        @endforeach
+
+
+
+
+                                                    </td>
                                                     <td>
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
@@ -122,7 +163,7 @@
                                                     </td>
                                                     <td>ok</td>
                                                 </tr>
-                                                @endfor
+                                                @endforeach
 
                                             </tbody>
                                         </table>
@@ -166,7 +207,7 @@
         <script type="text/javascript" src="/DataTables/Buttons-1.5.6/js/buttons.print.min.js"></script>
         <script type="text/javascript" src="/DataTables/Buttons-1.5.6/js/buttons.colVis.min.js"></script>
         <script type="text/javascript" src="/DataTables/Buttons-1.5.6/js/buttons.bootstrap4.min.js"></script>
-        
+
         <!-- Page level plugins DataTables -->
         <script src="vendor/datatables/jquery.dataTables.min.js"></script>
         <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
