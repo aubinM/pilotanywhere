@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Materiel_origine extends Model
 {
     public function matiere() {
-        return $this->belongsTo('App\Materiel');
+        return $this->belongsTo('App\Matiere');
     }
     public function ca_enregistrements() {
         return $this->belongsToMany('App\Ca_enregistrement')->withPivot('volume_debut', 'volume_fin');
