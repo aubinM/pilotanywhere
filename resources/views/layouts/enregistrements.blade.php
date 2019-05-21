@@ -28,6 +28,18 @@
         <link href="\dataTables\Buttons-1.5.6/css/buttons.dataTables.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="/DataTables/datatables.min.css"/>
 
+        <script type="text/javascript" charset="utf-8">
+            $(document).ready(function () {
+                $('input[name="chkOrgRow"]').on('change', function () {
+                    $(this).closest('tr').toggleClass('yellow', $(this).is(':checked'));
+                });
+            });
+        </script>
+
+        <script>
+
+        </script>
+
 
         <!--<link href="{{ asset('/css/bootstrap.min.css') }}" rel="stylesheet">-->
 
@@ -94,7 +106,7 @@
                                                     <th class="small font-weight-bold">Alarme</th>
 
                                                     <th class="small font-weight-bold">Check</th>
-                                                    <th class="small font-weight-bold">Commentaires</th>
+                                                    <th class="small font-weight-bold">Note</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -124,25 +136,12 @@
                                                         {{$seconds . " s"}}
                                                         @endif
 
-                                                        <!--                                                        @php
-                                                                                                                $debut = DateTime::createFromFormat('Y-m-d H:i:s',$enregistrement->date_debut);
-                                                                                                                $fin = DateTime::createFromFormat('Y-m-d H:i:s',$enregistrement->date_fin);
-                                                                           
-                                                                                                                $duree = $debut->diff($fin);
-                                                                                                                $heures = $duree->h;
-                                                                                                                $heures = $heures + ($duree->days*24);
-                                                                                                                $minutes = $duree->i;
-                                                                                                                $minutes = $minutes + ($duree->days*24);;
-                                                                                                                echo $heures
-                                                                                       
-                                                                                   
-                                                                                                            @endphp-->
                                                     </td>
-                                                    <td>250</td>
-                                                    <td>ok</td>
-                                                    <td>ok</td>
-                                                    <td>ok</td>
-                                                    <td>ok</td>
+                                                    <td>{{$enregistrement->total_volumes ? $enregistrement->total_volumes : ""}}</td>
+                                                    <td>{{$enregistrement->test_recyclage ? $enregistrement->test_recyclage : ""}}</td>
+                                                    <td>{{$enregistrement->test_delta_temperature ? $enregistrement->test_delta_temperature : ""}}</td>
+                                                    <td>{{$enregistrement->test_delta_pression ? $enregistrement->test_delta_pression : ""}}</td>
+                                                    <td>{{$enregistrement->validation_globale ? $enregistrement->validation_globale : ""}}</td>
                                                     <td>
 
                                                         @foreach($enregistrement->alarmes as $alarme)
@@ -155,13 +154,20 @@
                                                     </td>
                                                     <td>
                                                         <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                                                            <label class="form-check-label" for="defaultCheck1">
+                                                            <input type='checkbox' name='chkOrgRow' id='chkOrgRow'/>
 
                                                             </label>
                                                         </div>
+
                                                     </td>
-                                                    <td>ok</td>
+                                                    <td>@foreach($enregistrement->materiel_destinations_materiel_origines as $materiel_o)
+                                                        
+                                                        {{$materiel_o->pivot->volume}}
+                                                        
+                                                    
+                                                    
+                                                        @endforeach
+                                                    </td>
                                                 </tr>
                                                 @endforeach
 

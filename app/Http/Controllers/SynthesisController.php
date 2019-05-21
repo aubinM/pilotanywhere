@@ -48,8 +48,10 @@ class SynthesisController extends Controller
      */
     public function show($id)
     {
+        
+        $enregistrement = \App\Ca_enregistrement::find($id);
 
-         return view('layouts.syntheses', compact('id'));
+         return view('layouts.syntheses', compact('enregistrement'));
 
     }
 

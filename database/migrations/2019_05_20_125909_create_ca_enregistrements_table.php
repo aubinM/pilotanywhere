@@ -17,18 +17,20 @@ class CreateCaEnregistrementsTable extends Migration {
             $table->integer('materiel_autonome_id');
             $table->integer('run');
 
+
             $table->dateTime('date_debut')->nullable();
             $table->dateTime('date_fin')->nullable();
-            $table->dateTime('checked_at')->nullable();
-            $table->integer('checked_by')->nullable();
-            $table->string('commentaire', 280);
-            $table->boolean('validation_globale')->nullable();
+            $table->float('total_volumes');
             $table->float('test_reclyclage')->nullable();
             $table->boolean('test_reclyclage_valide')->nullable();
             $table->float('test_delta_temperature')->nullable();
             $table->boolean('test_delta_temperature_valide')->nullable();
             $table->float('test_delta_pression')->nullable();
             $table->boolean('test_delta_pression_valide')->nullable();
+            $table->boolean('validation_globale')->nullable();
+            $table->dateTime('checked_at')->nullable();
+            $table->integer('checked_by')->nullable();
+            $table->string('commentaire', 280);
 
 
 
