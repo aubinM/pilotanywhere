@@ -16,7 +16,7 @@
         <table class="table table-bordered table-hover table-sm w-auto"  >
             <thead>
                 <tr>
-                    <th rowspan="2" class="small font-weight-bold">Tanks</th>
+                    <th rowspan="2" class="small font-weight-bold text-center">Tanks</th>
                     @php
 
                         $matieres =array();
@@ -28,14 +28,14 @@
                         $matieres_count=array_count_values($matieres);
                         $matieres =  array_unique($matieres);
                         foreach($matieres as $matiere){
-                            echo '<th colspan="'.$matieres_count[$matiere].'" class="small font-weight-bold">'.$matiere.'</th>';
+                            echo '<th colspan="'.$matieres_count[$matiere].'" class="small font-weight-bold text-center">'.$matiere.'</th>';
                             
                         }
                         
 
                     @endphp
                     
-                    <th  class="small font-weight-bold">Total</th>
+                    <th class="small font-weight-bold text-center">Total</th>
 
 
 
@@ -62,7 +62,7 @@
                     {{$materiel_o->pivot->volume_debut}}
                     </td>
                     @endforeach
-                    <td></td>
+                    <td class="bg-secondary"></td>
                     
                 </tr>
 
@@ -73,7 +73,7 @@
                     {{$materiel_o->pivot->volume_fin}}
                     </td>
                     @endforeach
-                    <td></td>
+                    <td class="bg-secondary"></td>
                 </tr>
                 <tr>
                     <td>Soutiré</td>
@@ -82,7 +82,7 @@
                     {{$materiel_o->pivot->volume_debut - $materiel_o->pivot->volume_fin }}
                     </td>
                     @endforeach
-                    <td></td>
+                    <td class="bg-secondary"></td>
                     
                 </tr>
 
