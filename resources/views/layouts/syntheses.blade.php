@@ -11,145 +11,165 @@
 </div>
 <p><a href="{{route('enregistrements')}}" class="text-primary fas fa-arrow-left"> Retour aux enregistrements</a></p>
 
+
+
 <div class="card-body">
-    <div class="table">
-        <table class="table table-bordered table-hover table-sm w-auto"  >
-            <thead>
-                <tr>
-                    <th rowspan="2" class="small font-weight-bold text-center">Tanks</th>
-                    @php
+    <div class="table ">
+        <table class="table table-bordered table-hover table-sm "  >
+            @php
 
-                    $matieres =array();
-                    foreach($enregistrement->materiel_origines as $materiel_o){
+            $matieres =array();
 
-                    array_push($matieres,$materiel_o->matiere->name);
+            foreach($enregistrement->materiel_origines as $materiel_o){
 
-                    }
-                    $matieres_count=array_count_values($matieres);
-                    $matieres =  array_unique($matieres);
-                    foreach($matieres as $matiere){
-                    echo '<th colspan="'.$matieres_count[$matiere].'" class="small font-weight-bold text-center">'.$matiere.'</th>';
-
-                    }
+            array_push($matieres,$materiel_o->matiere->name);
 
 
-                    @endphp
+            }
 
-                    <th class="small font-weight-bold text-center">Total</th>
+            $matieres_count=array_count_values($matieres);
+            $matieres =  array_unique($matieres);
+
+            @endphp
+
+            <tr>
+                <th rowspan="2" class="small font-weight-bold text-center">Tanks</th>
+                @php
+                foreach($matieres as $matiere){
+                echo '<th colspan="'.$matieres_count[$matiere].'" class="small font-weight-bold text-center">'.$matiere.'</th>';
+                }
+                @endphp
+                <th class="small font-weight-bold text-center">Total</th>
+
+            </tr>
+
+            <tr>
+                @php
+                foreach($enregistrement->materiel_origines as $materiel_o){
+                echo '<td class="small font-weight-bold text-center">'.$materiel_o->name.'</td>';
+                }
+                @endphp
+            </tr>
+            <tr>
+                <td>Vol début run</td>
+                @foreach($enregistrement->materiel_origines as $materiel_o)
+                <td>
+                    {{$materiel_o->pivot->volume_debut}}
+                </td>
+                @endforeach
+                <td class="bg-secondary"></td>
+
+            </tr>
+            <tr>
+                <td>Vol fin run</td>
+                @foreach($enregistrement->materiel_origines as $materiel_o)
+                <td>
+                    {{$materiel_o->pivot->volume_fin}}
+                </td>
+                @endforeach
+                <td class="bg-secondary"></td>
+            </tr>
+            <tr>
+                <td>Soutiré</td>
+                @foreach($enregistrement->materiel_origines as $materiel_o)
+                <td>
+                    {{$materiel_o->pivot->volume_debut - $materiel_o->pivot->volume_fin }}
+                </td>
+                @endforeach
+                <td class="bg-secondary"></td>
+
+            </tr>
+
+            <tr class="blank_row select-row">
+                <td colspan="1000">&nbsp;</td>
+            </tr>
 
 
 
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td></td>
-                    @php
-                    foreach($enregistrement->materiel_origines as $materiel_o){
+            <tr>
+                <th rowspan="2" class="small font-weight-bold text-center">Tanks</th>
+                @php
+                foreach($matieres as $matiere){
+                echo '<th colspan="'.$matieres_count[$matiere].'" class="small font-weight-bold text-center">'.$matiere.'</th>';
+                }
+                @endphp
+                <th class="small font-weight-bold text-center">Total</th>
+
+            </tr>
+
+            <tr>
+
+                @php
+                foreach($enregistrement->materiel_origines as $materiel_o){
 
 
-                    echo '<td>'.$materiel_o->name.'</td>';
+                echo '<td class="small font-weight-bold text-center">'.$materiel_o->name.'</td>';
 
-                    }
-                    @endphp
+                }
+                @endphp
 
-                </tr>
-                <tr>
-                    <td>Vol début run</td>
-
-                    @foreach($enregistrement->materiel_origines as $materiel_o)
-                    <td>
-                        {{$materiel_o->pivot->volume_debut}}
-                    </td>
+            </tr>
+            @foreach($enregistrement->materiel_destinations as $materiel_d)
+            <tr>
+                <td class="small">{{$materiel_d->name}}</td>
+                @foreach($enregistrement->materiel_origines as $materiel_o)
+                <td>
+                    @foreach($enregistrement->materiel_destinations_materiel_origines as $materiels)
+                    @if(($materiels->pivot->materiel_destination_id == $materiel_d->id) && ($materiels->pivot->materiel_origine_id == $materiel_o->id))
+                    {{$materiels->pivot->volume}}
+                    @endif
                     @endforeach
-                    <td class="bg-secondary"></td>
+                </td>
+                @endforeach
 
-                </tr>
+                <td>
+                    @php $total_destinations = 0; @endphp
+                    @foreach($enregistrement->materiel_destinations_materiel_origines as $materiels)
+                    @if($materiels->pivot->materiel_destination_id == $materiel_d->id)
+                    @php $total_destinations = $total_destinations + $materiels->pivot->volume @endphp
+                    @endif
 
-                <tr>
-                    <td>Vol fin run</td>
-                    @foreach($enregistrement->materiel_origines as $materiel_o)
-                    <td>
-                        {{$materiel_o->pivot->volume_fin}}
-                    </td>
                     @endforeach
-                    <td class="bg-secondary"></td>
-                </tr>
-                <tr>
-                    <td>Soutiré</td>
-                    @foreach($enregistrement->materiel_origines as $materiel_o)
-                        <td>
-                            {{$materiel_o->pivot->volume_debut - $materiel_o->pivot->volume_fin }}
-                        </td>
+                    {{$total_destinations!=0 ? $total_destinations : ""}}
+                </td>
+
+            </tr>
+
+
+            @endforeach
+            <tr>
+
+                <td class="small">Total</td>
+                @foreach($enregistrement->materiel_origines as $materiel_o)
+                <td>
+                    @php $total_origines = 0; @endphp
+                    @foreach($enregistrement->materiel_destinations_materiel_origines as $materiels)
+                    @if($materiels->pivot->materiel_origine_id == $materiel_o->id)
+                    @php $total_origines = $total_origines + $materiels->pivot->volume @endphp
+                    @endif
+
                     @endforeach
-                    <td class="bg-secondary"></td>
-
-                </tr>
-
-
-            </tbody>
-
-        </table>
+                    {{$total_origines!=0 ? $total_origines : ""}}
+                </td>
+                @endforeach
+                <td>
+                    @php $total_global = 0; @endphp
 
 
-        <table class="table table-bordered table-hover table-sm w-auto"  >
-            <thead>
-                <tr>
-                    <th rowspan="2" class="small font-weight-bold text-center">Tanks</th>
-                    @php
-
-                        $matieres =array();
-                        foreach($enregistrement->materiel_origines as $materiel_o){
-
-                        array_push($matieres,$materiel_o->matiere->name);
-
-                        }
-                        $matieres_count=array_count_values($matieres);
-                        $matieres =  array_unique($matieres);
-                        foreach($matieres as $matiere){
-                        echo '<th colspan="'.$matieres_count[$matiere].'" class="small font-weight-bold text-center">'.$matiere.'</th>';
-
-                        }
-
-
-                    @endphp
-
-                    <th class="small font-weight-bold text-center">Total</th>
-
-
-
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td></td>
-                    @php
-                        foreach($enregistrement->materiel_origines as $materiel_o){
-
-
-                        echo '<td>'.$materiel_o->name.'</td>';
-
-                        }
-                    @endphp
-
-                </tr>
-                @foreach($enregistrement->materiel_destinations as $materiel_d)
-                 <tr>
-                     <td>{{$materiel_d->name}}</td>
-                     @foreach($enregistrement->materiel_origines as $materiel_o)
-                    <td>
-                        @foreach($enregistrement->materiel_destinations_materiel_origines as $materiels)
-                            @if(($materiels->pivot->materiel_destination_id == $materiel_d->id) && ($materiels->pivot->materiel_origine_id == $materiel_o->id))
-                                {{$materiels->pivot->volume}}
-                            @endif
-                        @endforeach
-                    </td>
+                    @foreach($enregistrement->materiel_destinations_materiel_origines as $materiels)
+                    @php $total_global = $total_global + $materiels->pivot->volume @endphp
                     @endforeach
-                    <td class="bg-secondary"></td>
-                 </tr>
-                 
-                 @endforeach
-            </tbody>
+
+
+                    {{$total_global!=0 ? $total_global : ""}}
+
+
+
+                </td>
+            </tr>
+
+
+
 
         </table>
     </div>

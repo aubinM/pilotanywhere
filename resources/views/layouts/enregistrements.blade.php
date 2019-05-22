@@ -89,7 +89,7 @@
 
                                 <div class="card-body">
                                     <div class="table">
-                                        <table class="table table-responsive table-bordered table-hover table-sm w-auto" id="dataTable"  >
+                                        <table class="table table-responsive table-bordered table-hover table-sm" id="dataTable"  >
                                             <thead>
                                                 <tr>
                                                     <th class="small font-weight-bold">Séquence</th>
@@ -104,7 +104,6 @@
                                                     <th class="small font-weight-bold">Test delta Pression</th>
                                                     <th class="small font-weight-bold">Validation globale</th>
                                                     <th class="small font-weight-bold">Alarme</th>
-
                                                     <th class="small font-weight-bold">Check</th>
                                                     <th class="small font-weight-bold">Note</th>
                                                 </tr>
@@ -160,13 +159,10 @@
                                                         </div>
 
                                                     </td>
-                                                    <td>@foreach($enregistrement->materiel_destinations_materiel_origines as $materiel_o)
+                                                    <td>
                                                         
-                                                        {{$materiel_o->pivot->volume}}
+                                                        {{$enregistrement->commentaire}}
                                                         
-                                                    
-                                                    
-                                                        @endforeach
                                                     </td>
                                                 </tr>
                                                 @endforeach

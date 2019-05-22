@@ -18,6 +18,7 @@
 
         <!-- Custom styles for this template-->
         <link href="/css/sb-admin-2.min.css" rel="stylesheet">
+        <link href="{{asset('css/syntheses.css')}}" rel="stylesheet">
 
         <!-- Custom styles for DataTables-->
 <!--        <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">

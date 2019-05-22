@@ -63,10 +63,7 @@ $(document).ready(function () {
             'selectAll',
             'selectNone'
         ],
-        "lengthMenu": [25, 10, 50, 75, 100],
-        scrollY:        400,
-        scrollCollapse: true,
-        scroller:       true
+        "lengthMenu": [25, 10, 50, 75, 100]
 
 
     });
