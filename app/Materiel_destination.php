@@ -10,7 +10,7 @@ class Materiel_destination extends Model
         return $this->belongsTo('App\Materiel_autonome');
     }
     public function ca_enregistrements() {
-        return $this->belongsToMany('App\Ca_enregistrement')->withPivot('volume_debut', 'volume_fin');
+        return $this->belongsToMany('App\Ca_enregistrement');
     }
 
     public function materiel_origines() {
