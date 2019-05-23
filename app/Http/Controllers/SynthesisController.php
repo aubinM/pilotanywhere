@@ -13,8 +13,12 @@ class SynthesisController extends Controller
      */
     public function index()
     {
+        
+        $enregistrement = \App\Ca_enregistrement::all()->first();
+        $enregistrement_last = \App\Ca_enregistrement::all()->last();
+        $enregistrement_last_id = $enregistrement_last->id;
 
-        return view('layouts.syntheses');
+        return view('layouts.syntheses',compact('enregistrement','enregistrement_last_id'));
        
 
     }
@@ -50,8 +54,10 @@ class SynthesisController extends Controller
     {
         
         $enregistrement = \App\Ca_enregistrement::find($id);
+        $enregistrement_last = \App\Ca_enregistrement::all()->last();
+        $enregistrement_last_id = $enregistrement_last->id;
 
-         return view('layouts.syntheses', compact('enregistrement'));
+         return view('layouts.syntheses', compact('enregistrement','enregistrement_last_id'));
 
     }
 

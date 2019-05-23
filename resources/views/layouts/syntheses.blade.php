@@ -6,11 +6,34 @@
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Synthèse @if(isset($enregistrement->id)) {{$enregistrement->id}} @endif</h1>
-
-
 </div>
-<p><a href="{{route('enregistrements')}}" class="text-primary fas fa-arrow-left"> Retour aux enregistrements</a></p>
 
+
+
+    <nav aria-label="Page navigation example">
+
+        
+            <div class="d-flex justify-content-between">
+                
+            
+        
+                <li class="page-item" style="list-style-type: none;">
+                    <a class="page-link" href="{{$enregistrement->id-1 > 0 ? route('syntheses.show', $enregistrement->id-1) : ""}}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+    
+   
+            <li class="page-item " style="list-style-type: none;">
+                <a class="page-link" href="{{$enregistrement->id+1 <= $enregistrement_last_id ? route('syntheses.show', $enregistrement->id+1) : ""}}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </li>
+     
+        
+    </nav>
 
 
 <div class="card-body">

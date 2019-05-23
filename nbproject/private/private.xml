@@ -7,10 +7,9 @@
             <file>file:/C:/xampp/htdocs/cipanywhere/resources/views/layouts/syntheses.blade.php</file>
             <file>file:/C:/xampp/htdocs/cipanywhere/app/Http/Controllers/SynthesisController.php</file>
             <file>file:/C:/xampp/htdocs/cipanywhere/app/Materiel_origine.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/public/css/syntheses.css</file>
             <file>file:/C:/xampp/htdocs/cipanywhere/resources/views/layouts/enregistrements.blade.php</file>
-            <file>file:/C:/xampp/htdocs/cipanywhere/app/Http/Controllers/RecordsController.php</file>
             <file>file:/C:/xampp/htdocs/cipanywhere/resources/views/includes/sidebar.blade.php</file>
-            <file>file:/C:/xampp/htdocs/cipanywhere/app/Matiere.php</file>
         </group>
     </open-files>
 </project-private>
