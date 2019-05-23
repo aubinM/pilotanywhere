@@ -89,7 +89,7 @@
 
                                 <div class="card-body">
                                     <div class="table">
-                                        <table class="table table-responsive table-bordered table-hover table-sm" id="dataTable"  >
+                                        <table class=" table table-responsive table-bordered table-sm table-striped table-hover " id="dataTable"  >
                                             <thead>
                                                 <tr>
                                                     <th class="small font-weight-bold">Séquence</th>
@@ -142,10 +142,30 @@
                                                     <td>{{$enregistrement->test_delta_pression ? $enregistrement->test_delta_pression : ""}}</td>
                                                     <td>{{$enregistrement->validation_globale ? $enregistrement->validation_globale : ""}}</td>
                                                     <td>
+                                                        @php
+                                                        $critical_1 = 0;
+                                                        $critical_2 = 0;
+                                                        $alarmes_names_1 = [];
+                                                        $alarmes_names_2 = [];
 
-                                                        @foreach($enregistrement->alarmes as $alarme)
-                                                        {{$alarme->name}}
-                                                        @endforeach
+                                                        foreach($enregistrement->alarmes as $alarme)
+                                                        {
+                                                            if($alarme->critical_level == 1){
+                                                                $critical_1 ++;
+                                                                array_push($alarmes_names_1,$alarme->name);
+                                                            } elseif($alarme->critical_level == 2) {
+                                                                $critical_2 ++;
+                                                                array_push($alarmes_names_2,$alarme->name);
+                                                            }
+                                                        }
+                                                        if($critical_1 != 0){
+                                                            echo '<p class="text-center ">'.$critical_1." ".'<i class="fas fa-times text-warning" data-toggle="tooltip"  data-html="true" title="'.implode("<br>",$alarmes_names_1).'"></i></p>';
+                                                        }
+                                                        if($critical_2 != 0){
+                                                            echo '<p class="text-center ">'.$critical_2." ".'<i class="fas fa-times text-danger" data-toggle="tooltip" data-html="true" title="'.implode("<br>",$alarmes_names_1).'"></i></p>';
+                                                        }
+
+                                                        @endphp
 
 
 
@@ -160,9 +180,9 @@
 
                                                     </td>
                                                     <td>
-                                                        
+
                                                         {{$enregistrement->commentaire}}
-                                                        
+
                                                     </td>
                                                 </tr>
                                                 @endforeach
@@ -213,6 +233,11 @@
         <!-- Page level plugins DataTables -->
         <script src="vendor/datatables/jquery.dataTables.min.js"></script>
         <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+        </script>
 
 
 
