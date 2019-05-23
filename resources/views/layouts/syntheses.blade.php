@@ -13,24 +13,32 @@
     <nav aria-label="Page navigation example">
 
         
-            <div class="d-flex justify-content-between">
+            <ul class="pagination justify-content-center">
                 
             
-        
-                <li class="page-item" style="list-style-type: none;">
+                @if($enregistrement->id-1 < 1)
+                    <li class="page-item disabled" style="list-style-type: none;">
+                @else 
+                    <li class="page-item" style="list-style-type: none;">
+                @endif
                     <a class="page-link" href="{{$enregistrement->id-1 > 0 ? route('syntheses.show', $enregistrement->id-1) : ""}}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                        <span class="sr-only">Previous</span>
+                        <span aria-hidden="true">Précédent</span>
+                       
                     </a>
                 </li>
     
    
-            <li class="page-item " style="list-style-type: none;">
+            @if($enregistrement->id+1 > $enregistrement_last_id)
+                    <li class="page-item disabled" style="list-style-type: none;">
+                @else 
+                    <li class="page-item" style="list-style-type: none;">
+                @endif
                 <a class="page-link" href="{{$enregistrement->id+1 <= $enregistrement_last_id ? route('syntheses.show', $enregistrement->id+1) : ""}}" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                    <span class="sr-only">Next</span>
+                    <span aria-hidden="true">Suivant</span>
+                    
                 </a>
-            </li>
+                </li>
+            </ul>
      
         
     </nav>
@@ -189,6 +197,9 @@
 
 
                 </td>
+            </tr>
+            <tr class="blank_row select-row">
+                <td colspan="1000">&nbsp;</td>
             </tr>
 
 

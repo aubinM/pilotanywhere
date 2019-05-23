@@ -41,7 +41,7 @@
         </a>
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" href="{{route('enregistrements')}}">Enregistrements</a>
+                <a class="collapse-item" href="{{route('enregistrements.index')}}">Enregistrements</a>
                 <a class="collapse-item" href="{{route('syntheses.index')}}">Syntheses</a>
             </div>
         </div>

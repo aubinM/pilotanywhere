@@ -6,6 +6,7 @@
 {
     height: 20px !important; /* overwrites any other rules */
     empty-cells: hide;
+    border-color: white;
 }
 
 .table-hover > tbody > tr.select-row:hover > td,
@@ -13,24 +14,46 @@
     background-color: #f8f9fc;
 }
 
-.container-perso {
+.table2 {
   width: 100%;
-  padding-right: 0.75rem;
-  padding-left: 0.75rem;
-  margin-right: 14rem !important;
-  margin-left: auto;
+  margin-bottom: 1rem;
+  color: #212529;
+  border: solid black;
 }
 
-.navbar > .container-fluid-perso {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
+.table2 th,
+.table2 td {
+  padding: 0.75rem;
+  vertical-align: top;
+  border-top: 1px solid #dee2e6;
+}
+
+.table2 thead th {
+  vertical-align: bottom;
+  border-bottom: 3px solid #dee2e6;
+}
+
+.table2 tbody + tbody {
+  border-top: 2px solid #dee2e6;
+}
+
+.table-sm th,
+.table-sm td {
+  padding: 0.3rem;
+}
+
+.table-bordered2 {
+  border: 1px solid #dee2e6;
+}
+
+.table-bordered2 th,
+.table-bordered2 td {
+  border: 1px solid black;
+}
+
+.border-bottom-black{
+  border-bottom: 3px solid black;
+}
+table2 tr td:nth-child(2) {
+  border-left: 0;
 }

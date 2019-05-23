@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Ca_enregistrement;
 
 class SynthesisController extends Controller
 {
@@ -14,8 +15,8 @@ class SynthesisController extends Controller
     public function index()
     {
         
-        $enregistrement = \App\Ca_enregistrement::all()->first();
-        $enregistrement_last = \App\Ca_enregistrement::all()->last();
+        $enregistrement = Ca_enregistrement::all()->first();
+        $enregistrement_last = Ca_enregistrement::all()->last();
         $enregistrement_last_id = $enregistrement_last->id;
 
         return view('layouts.syntheses',compact('enregistrement','enregistrement_last_id'));
@@ -53,9 +54,9 @@ class SynthesisController extends Controller
     public function show($id)
     {
         
-        $enregistrement = \App\Ca_enregistrement::find($id);
-        $enregistrement_last = \App\Ca_enregistrement::all()->last();
-        $enregistrement_last_id = $enregistrement_last->id;
+        $enregistrement = Ca_enregistrement::find($id);
+        $enregistrement_last_id = Ca_enregistrement::all()->last()->id;
+ 
 
          return view('layouts.syntheses', compact('enregistrement','enregistrement_last_id'));
 

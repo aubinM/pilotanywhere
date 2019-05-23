@@ -21,8 +21,8 @@ class CreateCaEnregistrementsTable extends Migration {
             $table->dateTime('date_debut')->nullable();
             $table->dateTime('date_fin')->nullable();
             $table->float('total_volumes');
-            $table->float('test_reclyclage')->nullable();
-            $table->boolean('test_reclyclage_valide')->nullable();
+            $table->float('test_recyclage')->nullable();
+            $table->boolean('test_recyclage_valide')->nullable();
             $table->float('test_delta_temperature')->nullable();
             $table->boolean('test_delta_temperature_valide')->nullable();
             $table->float('test_delta_pression')->nullable();

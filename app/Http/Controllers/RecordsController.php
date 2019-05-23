@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Ca_enregistrement;
 
 class RecordsController extends Controller
 {
@@ -74,7 +75,14 @@ class RecordsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $input =  $request->all();
+        dd($input);
+        $enregistrement = Ca_enregistrement::find($id)->update($input);
+        $enregistrements = Ca_enregistrement::all();
+        
+        
+
+        return view('layouts.enregistrements', compact('enregistrements'));
     }
 
     /**

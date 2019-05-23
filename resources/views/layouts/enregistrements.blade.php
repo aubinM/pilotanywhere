@@ -91,32 +91,32 @@
                                     <div class="table">
                                         <table class=" table table-responsive table-bordered table-sm table-striped table-hover " id="dataTable"  >
                                             <thead>
-                                                <tr>
-                                                    <th class="small font-weight-bold">Séquence</th>
-                                                    <th class="small font-weight-bold">Circuit autonome</th>
-                                                    <th class="small font-weight-bold">Run</th>
-                                                    <th class="small font-weight-bold">Date début</th>
-                                                    <th class="small font-weight-bold">Date fin</th>
-                                                    <th class="small font-weight-bold">Durée du run</th>
-                                                    <th class="small font-weight-bold">Total</th>
-                                                    <th class="small font-weight-bold">Test Recyclage</th>
-                                                    <th class="small font-weight-bold">Test delta Température</th>
-                                                    <th class="small font-weight-bold">Test delta Pression</th>
-                                                    <th class="small font-weight-bold">Validation globale</th>
-                                                    <th class="small font-weight-bold">Alarme</th>
-                                                    <th class="small font-weight-bold">Check</th>
-                                                    <th class="small font-weight-bold">Note</th>
+                                                <tr >
+                                                    <th class="small font-weight-bold text-center align-middle">Séquence</th>
+                                                    <th class="small font-weight-bold text-center align-middle">Circuit autonome</th>
+                                                    <th class="small font-weight-bold text-center align-middle">Run</th>
+                                                    <th class="small font-weight-bold text-center align-middle">Date début</th>
+                                                    <th class="small font-weight-bold text-center align-middle">Date fin</th>
+                                                    <th class="small font-weight-bold text-center align-middle">Durée du run</th>
+                                                    <th class="small font-weight-bold text-center align-middle">Total</th>
+                                                    <th class="small font-weight-bold text-center align-middle">Test Recyclage</th>
+                                                    <th class="small font-weight-bold text-center align-middle">Test delta Température</th>
+                                                    <th class="small font-weight-bold text-center align-middle">Test delta Pression</th>
+                                                    <th class="small font-weight-bold text-center align-middle">Validation globale</th>
+                                                    <th class="small font-weight-bold text-center align-middle">Alarme</th>
+                                                    <th class="small font-weight-bold text-center align-middle">Check</th>
+                                                    <th class="small font-weight-bold text-center align-middle">Note</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @foreach($enregistrements as $enregistrement)
                                                 <tr>
-                                                    <td><a href="{{route('syntheses.show', $enregistrement->id)}}" class="text-primary">{{$enregistrement->id}}</a></td>
-                                                    <td>{{$enregistrement->materiel_autonome->name}}</td>
-                                                    <td>{{$enregistrement->id}}</td>
-                                                    <td>{{$enregistrement->date_debut}}</td>
-                                                    <td>{{$enregistrement->date_fin}}</td>
-                                                    <td>
+                                                    <td class="text-center align-middle"><a href="{{route('syntheses.show', $enregistrement->id)}}" class="text-primary">{{$enregistrement->id}}</a></td>
+                                                    <td class="text-center align-middle">{{$enregistrement->materiel_autonome->name}}</td>
+                                                    <td class="text-center align-middle">{{$enregistrement->id}}</td>
+                                                    <td class="text-center align-middle">{{$enregistrement->date_debut}}</td>
+                                                    <td class="text-center align-middle">{{$enregistrement->date_fin}}</td>
+                                                    <td class="text-center align-middle">
 
                                                         @php
                                                         $start = Carbon\Carbon::parse($enregistrement->date_debut);
@@ -136,12 +136,42 @@
                                                         @endif
 
                                                     </td>
-                                                    <td>{{$enregistrement->total_volumes ? $enregistrement->total_volumes : ""}}</td>
+                                                    <td class="text-center align-middle">{{$enregistrement->total_volumes ? $enregistrement->total_volumes : ""}}</td>
+
+                                                    @if(!is_null($enregistrement->test_recyclage_valide))
+                                                    @if($enregistrement->test_recyclage_valide == 0)
+                                                    <td class="table-danger text-center align-middle">{{$enregistrement->test_recyclage ? $enregistrement->test_recyclage : ""}}</td>
+                                                    @elseif($enregistrement->test_recyclage_valide == 1)
+                                                    <td class="table-success text-center align-middle">{{$enregistrement->test_recyclage ? $enregistrement->test_recyclage : ""}}</td>
+                                                    @endif
+                                                    @else
                                                     <td>{{$enregistrement->test_recyclage ? $enregistrement->test_recyclage : ""}}</td>
+                                                    @endif
+
+                                                    @if(!is_null($enregistrement->test_delta_temperature_valide))
+
+                                                    @if($enregistrement->test_delta_temperature_valide == 0)
+                                                    <td class="table-danger">{{$enregistrement->test_delta_temperature ? $enregistrement->test_delta_temperature : ""}}</td>
+                                                    @elseif($enregistrement->test_delta_temperature_valide == 1)
+                                                    <td class="table-success">{{$enregistrement->test_delta_temperature ? $enregistrement->test_delta_temperature : ""}}</td>
+                                                    @endif
+                                                    @else
                                                     <td>{{$enregistrement->test_delta_temperature ? $enregistrement->test_delta_temperature : ""}}</td>
+                                                    @endif
+
+                                                    @if(!is_null($enregistrement->test_delta_pression_valide))
+
+                                                    @if($enregistrement->test_delta_pression_valide == 0)
+                                                    <td class="table-danger">{{$enregistrement->test_delta_pression ? $enregistrement->test_delta_pression : ""}}</td>
+                                                    @elseif($enregistrement->test_delta_pression_valide == 1)
+                                                    <td class="table-success">{{$enregistrement->test_delta_pression ? $enregistrement->test_delta_pression : ""}}</td>
+                                                    @endif
+                                                    @else
                                                     <td>{{$enregistrement->test_delta_pression ? $enregistrement->test_delta_pression : ""}}</td>
-                                                    <td>{{$enregistrement->validation_globale ? $enregistrement->validation_globale : ""}}</td>
-                                                    <td>
+                                                    @endif
+
+                                                    <td class="text-center align-middle">{{$enregistrement->validation_globale ? $enregistrement->validation_globale : ""}}</td>
+                                                    <td class="text-center align-middle">
                                                         @php
                                                         $critical_1 = 0;
                                                         $critical_2 = 0;
@@ -150,19 +180,19 @@
 
                                                         foreach($enregistrement->alarmes as $alarme)
                                                         {
-                                                            if($alarme->critical_level == 1){
-                                                                $critical_1 ++;
-                                                                array_push($alarmes_names_1,$alarme->name);
-                                                            } elseif($alarme->critical_level == 2) {
-                                                                $critical_2 ++;
-                                                                array_push($alarmes_names_2,$alarme->name);
-                                                            }
+                                                        if($alarme->critical_level == 1){
+                                                        $critical_1 ++;
+                                                        array_push($alarmes_names_1,$alarme->name);
+                                                        } elseif($alarme->critical_level == 2) {
+                                                        $critical_2 ++;
+                                                        array_push($alarmes_names_2,$alarme->name);
+                                                        }
                                                         }
                                                         if($critical_1 != 0){
-                                                            echo '<p class="text-center ">'.$critical_1." ".'<i class="fas fa-times text-warning" data-toggle="tooltip"  data-html="true" title="'.implode("<br>",$alarmes_names_1).'"></i></p>';
+                                                        echo '<p class="text-center align-middle">'.$critical_1." ".'<i class="fas fa-times text-warning" data-toggle="tooltip"  data-html="true" title="'.implode("<br>",$alarmes_names_1).'"></i></p>';
                                                         }
                                                         if($critical_2 != 0){
-                                                            echo '<p class="text-center ">'.$critical_2." ".'<i class="fas fa-times text-danger" data-toggle="tooltip" data-html="true" title="'.implode("<br>",$alarmes_names_1).'"></i></p>';
+                                                        echo '<p class="text-center align-middle">'.$critical_2." ".'<i class="fas fa-times text-danger" data-toggle="tooltip" data-html="true" title="'.implode("<br>",$alarmes_names_1).'"></i></p>';
                                                         }
 
                                                         @endphp
@@ -171,7 +201,7 @@
 
 
                                                     </td>
-                                                    <td>
+                                                    <td class="text-center align-middle">
                                                         <div class="form-check">
                                                             <input type='checkbox' name='chkOrgRow' id='chkOrgRow'/>
 
@@ -179,9 +209,42 @@
                                                         </div>
 
                                                     </td>
-                                                    <td>
+                                                    <td class="text-center align-middle">
+                                                        {{$enregistrement->id}}
+                                                        <button type="button" class="btn" data-toggle="modal" data-target="#exampleModal" data-whatever="{{$enregistrement->commentaire}}" data-id="2">{{$enregistrement->commentaire}}</button>
 
-                                                        {{$enregistrement->commentaire}}
+                                                        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog" role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title" id="exampleModalLabel">Commentaire</h5>
+                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                            <span aria-hidden="true">&times;</span>
+                                                                        </button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        {!! Form::model($enregistrement, ['method'=>'PATCH', 'action'=> ['RecordsController@update', $enregistrement->id]]) !!}
+
+                                                                        <div class="form-group">
+                                                                            
+                                                                             {!!Form::text('id')!!}
+
+                                                                            
+                                                                            {!! Form::textarea('commentaire', null, ['class'=>'form-control'])!!}
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                        {!! Form::submit('Update Post', ['class'=>'btn btn-primary']) !!}
+                                                                    </div>
+                                                                    {!! Form::close() !!}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+
+
 
                                                     </td>
                                                 </tr>
@@ -237,6 +300,17 @@
             $(document).ready(function () {
                 $('[data-toggle="tooltip"]').tooltip();
             });
+
+            $('#exampleModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget) // Button that triggered the modal
+                var comment = button.data('whatever') // Extract info from data-* attributes
+                var id = button.data('id') // Extract info from data-* attributes
+                // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+                // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+                var modal = $(this)
+                modal.find('.modal-body textarea').val(comment)
+                modal.find('.modal-body hidden').val(id)
+            })
         </script>
 
 

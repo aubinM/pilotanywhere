@@ -26,5 +26,9 @@ class Ca_enregistrement extends Model {
     public function materiel_origines_materiel_destinations() {
         return $this->belongsToMany('App\Materiel_destination','ca_enregistrement_materiel_destination_materiel_origine')->withPivot('volume');
     }
+    
+    protected $fillable = [
+        'commentaire'
+    ];
 
 }
