@@ -43,6 +43,7 @@
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item" href="{{route('enregistrements.index')}}">Enregistrements</a>
                 <a class="collapse-item" href="{{route('syntheses.index')}}">Syntheses</a>
+                <a class="collapse-item" href="{{route('graphes.index')}}">Graphes</a>
             </div>
         </div>
     </li>

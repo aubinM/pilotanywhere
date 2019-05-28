@@ -7,11 +7,13 @@
     height: 20px !important; /* overwrites any other rules */
     empty-cells: hide;
     border-color: white;
+    border: none;
 }
 
 .table-hover > tbody > tr.select-row:hover > td,
 .select-row > td {
     background-color: #f8f9fc;
+    border: none;
 }
 
 .table2 {
@@ -57,3 +59,4 @@
 table2 tr td:nth-child(2) {
   border-left: 0;
 }
+

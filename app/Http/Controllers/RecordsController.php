@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Ca_enregistrement;
+use App\Http\Controllers\Auth;
+use Carbon\Carbon;
+use App\User;
+
 
 class RecordsController extends Controller
 {
@@ -15,7 +19,7 @@ class RecordsController extends Controller
     public function index()
     {
         
-        $enregistrements = \App\Ca_enregistrement::all();
+        $enregistrements = Ca_enregistrement::all();
         
         
         
@@ -63,7 +67,17 @@ class RecordsController extends Controller
      */
     public function edit($id)
     {
-        //
+        $enregistrement = Ca_enregistrement::find($id);
+        $user_id = \Auth::user()->id;
+        $enregistrement->checked_by = $user_id;
+        $checked_user_name = User::find($user_id)->login;
+        $enregistrement->checked_at = Carbon::now();
+        $enregistrement->save();
+        
+        $enregistrements = Ca_enregistrement::all();
+//        return response()->json();
+        return view('layouts.enregistrements', compact('enregistrements','checked_user_name'));
+        
     }
 
     /**
@@ -75,9 +89,11 @@ class RecordsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $input =  $request->all();
-        dd($input);
-        $enregistrement = Ca_enregistrement::find($id)->update($input);
+        $comment = $request->input('comment');
+        $id = $request->input('comment_id');
+        $enregistrement = Ca_enregistrement::find($id);
+        $enregistrement->commentaire = $comment;
+        $enregistrement->save();
         $enregistrements = Ca_enregistrement::all();
         
         

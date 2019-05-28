@@ -30,7 +30,7 @@ class CreateCaEnregistrementsTable extends Migration {
             $table->boolean('validation_globale')->nullable();
             $table->dateTime('checked_at')->nullable();
             $table->integer('checked_by')->nullable();
-            $table->string('commentaire', 280);
+            $table->string('commentaire', 280)->nullable();
 
 
 

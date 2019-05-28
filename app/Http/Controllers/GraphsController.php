@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Ca_enregistrement;
 
-class SynthesisController extends Controller
+class GraphsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,14 +14,7 @@ class SynthesisController extends Controller
      */
     public function index()
     {
-        
-        //Faire dernier par date debut plus tard
-        $enregistrement = Ca_enregistrement::all()->last();
-        $enregistrement_last_id = $enregistrement->id;
-
-        return view('layouts.syntheses',compact('enregistrement','enregistrement_last_id'));
-       
-
+        //
     }
 
     /**
@@ -53,13 +46,11 @@ class SynthesisController extends Controller
      */
     public function show($id)
     {
-        
         $enregistrement = Ca_enregistrement::find($id);
         $enregistrement_last_id = Ca_enregistrement::all()->last()->id;
  
 
-         return view('layouts.syntheses', compact('enregistrement','enregistrement_last_id'));
-
+         return view('layouts.graphes', compact('enregistrement','enregistrement_last_id'));
     }
 
     /**

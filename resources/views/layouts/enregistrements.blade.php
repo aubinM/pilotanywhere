@@ -28,27 +28,22 @@
         <link href="\dataTables\Buttons-1.5.6/css/buttons.dataTables.min.css" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="/DataTables/datatables.min.css"/>
 
-        <script type="text/javascript" charset="utf-8">
-            $(document).ready(function () {
-                $('input[name="chkOrgRow"]').on('change', function () {
-                    $(this).closest('tr').toggleClass('yellow', $(this).is(':checked'));
-                });
+<!--        <script>
+
+            $("chkOrgRow").click(function(){
+
+            $.ajax({
+            type: "GET",
+                    url: {{route('enregistrements.edit', "1")}},
+                    success: success
+            }).done(function(data) {
+            $('.alert-success').removeClass('hidden');
+            $('#myModal').modal('hide');
             });
-        </script>
-
-        <script>
-
-        </script>
-
+            });
+        </script>-->
 
         <!--<link href="{{ asset('/css/bootstrap.min.css') }}" rel="stylesheet">-->
-
-
-
-
-
-
-
 
     </head>
 
@@ -89,7 +84,7 @@
 
                                 <div class="card-body">
                                     <div class="table">
-                                        <table class=" table table-responsive table-bordered table-sm table-striped table-hover " id="dataTable"  >
+                                        <table class=" table table-responsive table-bordered table-sm table-striped table-hover " >
                                             <thead>
                                                 <tr >
                                                     <th class="small font-weight-bold text-center align-middle">Séquence</th>
@@ -111,9 +106,9 @@
                                             <tbody>
                                                 @foreach($enregistrements as $enregistrement)
                                                 <tr>
-                                                    <td class="text-center align-middle"><a href="{{route('syntheses.show', $enregistrement->id)}}" class="text-primary">{{$enregistrement->id}}</a></td>
+                                                    <td class="text-center align-middle"><a href="{{route('graphes.show', $enregistrement->id)}}" class="text-primary">{{$enregistrement->id}}</a></td>
                                                     <td class="text-center align-middle">{{$enregistrement->materiel_autonome->name}}</td>
-                                                    <td class="text-center align-middle">{{$enregistrement->id}}</td>
+                                                    <td class="text-center align-middle"><a href="{{route('syntheses.show', $enregistrement->id)}}" class="text-primary">{{$enregistrement->id}}</a></td>
                                                     <td class="text-center align-middle">{{$enregistrement->date_debut}}</td>
                                                     <td class="text-center align-middle">{{$enregistrement->date_fin}}</td>
                                                     <td class="text-center align-middle">
@@ -138,39 +133,53 @@
                                                     </td>
                                                     <td class="text-center align-middle">{{$enregistrement->total_volumes ? $enregistrement->total_volumes : ""}}</td>
 
-                                                    @if(!is_null($enregistrement->test_recyclage_valide))
-                                                    @if($enregistrement->test_recyclage_valide == 0)
-                                                    <td class="table-danger text-center align-middle">{{$enregistrement->test_recyclage ? $enregistrement->test_recyclage : ""}}</td>
+                                                    @if(!is_null($enregistrement->test_recyclage))
+                                                    @if($enregistrement->test_recyclage_valide == 0 && !is_null($enregistrement->test_recyclage_valide))
+                                                    <td class="table-danger text-center align-middle">{{$enregistrement->test_recyclage}}</td>
                                                     @elseif($enregistrement->test_recyclage_valide == 1)
-                                                    <td class="table-success text-center align-middle">{{$enregistrement->test_recyclage ? $enregistrement->test_recyclage : ""}}</td>
+                                                    <td class="table-success text-center align-middle">{{$enregistrement->test_recyclage}}</td>
+                                                    @else
+                                                    <td class="text-center align-middle">{{$enregistrement->test_recyclage}}</td>
                                                     @endif
                                                     @else
-                                                    <td>{{$enregistrement->test_recyclage ? $enregistrement->test_recyclage : ""}}</td>
+                                                    <td class="text-center align-middle"><i class="fas fa-times"></i></td>
                                                     @endif
 
-                                                    @if(!is_null($enregistrement->test_delta_temperature_valide))
+                                                    @if(!is_null($enregistrement->test_delta_temperature))
 
-                                                    @if($enregistrement->test_delta_temperature_valide == 0)
+                                                    @if($enregistrement->test_delta_temperature_valide == 0 && !is_null($enregistrement->test_delta_temperature_valide))
                                                     <td class="table-danger">{{$enregistrement->test_delta_temperature ? $enregistrement->test_delta_temperature : ""}}</td>
                                                     @elseif($enregistrement->test_delta_temperature_valide == 1)
                                                     <td class="table-success">{{$enregistrement->test_delta_temperature ? $enregistrement->test_delta_temperature : ""}}</td>
+                                                    @else
+                                                    <td class="text-center align-middle">{{$enregistrement->test_delta_temperature ? $enregistrement->test_delta_temperature : ""}}</td>
                                                     @endif
                                                     @else
-                                                    <td>{{$enregistrement->test_delta_temperature ? $enregistrement->test_delta_temperature : ""}}</td>
+                                                    <td class="text-center align-middle"><i class="fas fa-times"></i></td>
                                                     @endif
 
-                                                    @if(!is_null($enregistrement->test_delta_pression_valide))
-
-                                                    @if($enregistrement->test_delta_pression_valide == 0)
+                                                    @if(!is_null($enregistrement->test_delta_pression))
+                                                   
+                                                    @if($enregistrement->test_delta_pression_valide == 0 && !is_null($enregistrement->test_delta_pression_valide))
                                                     <td class="table-danger">{{$enregistrement->test_delta_pression ? $enregistrement->test_delta_pression : ""}}</td>
                                                     @elseif($enregistrement->test_delta_pression_valide == 1)
                                                     <td class="table-success">{{$enregistrement->test_delta_pression ? $enregistrement->test_delta_pression : ""}}</td>
+                                                    @else
+                                                    <td class="text-center align-middle">{{$enregistrement->test_delta_pression ? $enregistrement->test_delta_pression : ""}}</td>
                                                     @endif
                                                     @else
-                                                    <td>{{$enregistrement->test_delta_pression ? $enregistrement->test_delta_pression : ""}}</td>
+                                                    <td class="text-center align-middle"><i class="fas fa-times"></i></td>
                                                     @endif
 
-                                                    <td class="text-center align-middle">{{$enregistrement->validation_globale ? $enregistrement->validation_globale : ""}}</td>
+                                                    <td class="text-center align-middle">
+                                                        @if(is_null($enregistrement->validation_globale))
+                                                            <i class="fas fa-times"></i>
+                                                        @else
+                                                        {{$enregistrement->validation_globale}}
+                                                        
+                                                        @endif
+                                                    
+                                                    </td>
                                                     <td class="text-center align-middle">
                                                         @php
                                                         $critical_1 = 0;
@@ -189,10 +198,10 @@
                                                         }
                                                         }
                                                         if($critical_1 != 0){
-                                                        echo '<p class="text-center align-middle">'.$critical_1." ".'<i class="fas fa-times text-warning" data-toggle="tooltip"  data-html="true" title="'.implode("<br>",$alarmes_names_1).'"></i></p>';
+                                                        echo '<p style="height: 15px">'.$critical_1." ".'<i class="fas fa-times text-warning text-center align-middle " data-toggle="tooltip"  data-html="true" title="'.implode("<br hidden> ",$alarmes_names_1).'"></i></p>';
                                                         }
                                                         if($critical_2 != 0){
-                                                        echo '<p class="text-center align-middle">'.$critical_2." ".'<i class="fas fa-times text-danger" data-toggle="tooltip" data-html="true" title="'.implode("<br>",$alarmes_names_1).'"></i></p>';
+                                                        echo $critical_2." ".'<i class="fas fa-times text-danger text-center align-middle" data-toggle="tooltip" data-html="true" title="'.implode("<br>",$alarmes_names_2).'"></i>';
                                                         }
 
                                                         @endphp
@@ -202,41 +211,74 @@
 
                                                     </td>
                                                     <td class="text-center align-middle">
-                                                        <div class="form-check">
-                                                            <input type='checkbox' name='chkOrgRow' id='chkOrgRow'/>
+                                                        <!--                                                        <form action="{{$enregistrement->id}}" method="put" class="form-inline">-->
+                                                        {{ Form::open(array('url' => route('enregistrements.edit', $enregistrement->id), 'method' => 'GET', 'class'=>'')) }}
 
-                                                            </label>
-                                                        </div>
+
+
+                                                        @if(is_null($enregistrement->checked_by))
+
+                                                        <input class="" type='checkbox' name='chkOrgRow' id='chkOrgRow' onChange="this.form.submit()"/>
+
+                                                        @else 
+
+                                                        <i class="fas fa-check-square text-success text-center align-middle" data-toggle="tooltip" data-html="true" title="{{\App\User::find($enregistrement->checked_by)->login }}<br>{{$enregistrement->checked_at}}"></i>
+
+                                                        @endif
+
+
+
+                                                        {{ Form::close() }}
+
+
+                                                        <!--                                                        </form>-->
+
 
                                                     </td>
                                                     <td class="text-center align-middle">
-                                                        {{$enregistrement->id}}
-                                                        <button type="button" class="btn" data-toggle="modal" data-target="#exampleModal" data-whatever="{{$enregistrement->commentaire}}" data-id="2">{{$enregistrement->commentaire}}</button>
+                                                        @if(is_null($enregistrement->commentaire))
+                                                        <button type="button" class="btn " data-toggle="modal" data-target="#exampleModal" data-id="{{$enregistrement->id}}" data-whatever="{{$enregistrement->commentaire}}">
+                                                            <i class="far fa-comment-alt"></i>
+                                                        </button>
+                                                        @else 
+                                                        <button type="button" class="btn " data-toggle="modal" data-target="#exampleModal" data-id="{{$enregistrement->id}}" data-whatever="{{$enregistrement->commentaire}}" >
+                                                            @php
+
+                                                            $enregistrement_commentaire = [];
+                                                            array_push($enregistrement_commentaire,$enregistrement->commentaire);
+
+                                                            echo '<i class="fas fa-comment-alt" data-toggle="tooltip" data-html="true" title="'.implode("<br>",$enregistrement_commentaire).'"></i>';
+
+                                                            @endphp
+                                                        </button>
+                                                        <p hidden>{{$enregistrement->commentaire}}</p>
+
+                                                        @endif
 
                                                         <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                             <div class="modal-dialog" role="document">
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
                                                                         <h5 class="modal-title" id="exampleModalLabel">Commentaire</h5>
-                                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                            <span aria-hidden="true">&times;</span>
-                                                                        </button>
+
                                                                     </div>
                                                                     <div class="modal-body">
                                                                         {!! Form::model($enregistrement, ['method'=>'PATCH', 'action'=> ['RecordsController@update', $enregistrement->id]]) !!}
 
                                                                         <div class="form-group">
-                                                                            
-                                                                             {!!Form::text('id')!!}
 
+                                                                            <input type="hidden" name="comment_id" id="hiddenValue" value="" />
                                                                             
-                                                                            {!! Form::textarea('commentaire', null, ['class'=>'form-control'])!!}
+<!--                                                                            <textarea class="form-control" id="comment"></textarea>-->
+
+
+                                                                            {!! Form::textarea('comment', null, ['class'=>'form-control' , 'rows' => 3, 'id'=>'comment' ,'placeholder' => 'Ecrivez votre commentaire..'])!!}
                                                                         </div>
 
                                                                     </div>
                                                                     <div class="modal-footer">
-                                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                                        {!! Form::submit('Update Post', ['class'=>'btn btn-primary']) !!}
+                                                                        <button type="button" class="btn btn-secondary no_print" data-dismiss="modal">Fermer</button>
+                                                                        {!! Form::submit('Mettre à jour', ['class'=>'btn btn-primary']) !!}
                                                                     </div>
                                                                     {!! Form::close() !!}
                                                                 </div>
@@ -297,20 +339,24 @@
         <script src="vendor/datatables/jquery.dataTables.min.js"></script>
         <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
         <script>
-            $(document).ready(function () {
-                $('[data-toggle="tooltip"]').tooltip();
-            });
+                                                                $(document).ready(function () {
+                                                                    $('[data-toggle="tooltip"]').tooltip();
+                                                                });
+                                                                $('#exampleModal').on('show.bs.modal', function (event) {
+                                                                    var button = $(event.relatedTarget) // Button that triggered the modal
+                                                                    var comment = button.data('whatever') // Extract info from data-* attributes
+                                                                    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+                                                                    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+                                                                    var modal = $(this)
+                                                                    modal.find('.modal-body #comment').val(comment)
 
-            $('#exampleModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget) // Button that triggered the modal
-                var comment = button.data('whatever') // Extract info from data-* attributes
-                var id = button.data('id') // Extract info from data-* attributes
-                // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-                // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-                var modal = $(this)
-                modal.find('.modal-body textarea').val(comment)
-                modal.find('.modal-body hidden').val(id)
-            })
+                                                                })
+
+
+                                                                $('#exampleModal').on('show.bs.modal', function (event) {
+                                                                    var my_id_value = $(event.relatedTarget).data('id');
+                                                                    $(".modal-body #hiddenValue").val(my_id_value);
+                                                                })
         </script>
 
 
