@@ -19,5 +19,9 @@ class Materiel_autonome extends Model {
     public function materiel_destination() {
         return $this->hasMany('App\Materiel_destination');
     }
+    public function ca_enregsitrement_graphe_config() {
+        return $this->hasMany('App\Ca_enregsitrement_graphe_config');
+    }
+    
 
 }

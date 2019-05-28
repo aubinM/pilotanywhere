@@ -14,7 +14,11 @@ class GraphsController extends Controller
      */
     public function index()
     {
-        //
+        //Faire dernier par date debut plus tard
+        $enregistrement = Ca_enregistrement::all()->last();
+        
+
+        return view('layouts.graphes',compact('enregistrement'));
     }
 
     /**
