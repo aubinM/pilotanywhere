@@ -5,10 +5,14 @@
 use App\Stloup_pasteurisateur_standardisation_data;
 use Faker\Generator as Faker;
 
-$factory->define(Stloup_pasteurisateur_standardisation_data::class, function (Faker $faker) {
+
+
+$factory->define(Stloup_pasteurisateur_standardisation_data::class, function (Faker $faker, $options) {
+    
+    
+    
     return [
         'ca_enregistrement_id' => 1,
-        '_date' => $faker->dateTimeBetween($startDate = '-1 minutes', $endDate = 'now',  null),
         'Debit_Envoi' => $faker->randomFloat(2, 30, 32),
         'Debit_Retour' => $faker->randomFloat(2, 40, 42),
         'Temp_Retour' => $faker->randomFloat(2, 25, 35),

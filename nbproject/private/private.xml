@@ -3,11 +3,24 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/xampp/htdocs/cipanywhere/database/seeds/DatabaseSeeder.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/app/Ca_enregistrement.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/database/factories/DatasStloupFactory.php</file>
             <file>file:/C:/xampp/htdocs/cipanywhere/resources/views/layouts/syntheses.blade.php</file>
-            <file>file:/C:/xampp/htdocs/cipanywhere/routes/web.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/database/migrations/2019_05_28_121615_create_ca_enregistrement_graphe_configs_table.php</file>
             <file>file:/C:/xampp/htdocs/cipanywhere/resources/views/layouts/enregistrements.blade.php</file>
-            <file>file:/C:/xampp/htdocs/cipanywhere/app/Http/Controllers/RecordsController.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/database/migrations/2019_05_20_114631_create_materiel_autonomes_table.php</file>
             <file>file:/C:/xampp/htdocs/cipanywhere/resources/views/includes/sidebar.blade.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/database/seeds/DatasStloupPasteurisateurStandardisationTableSeeder.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/database/seeds/DatasStloupSeeder.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/app/Http/Controllers/SynthesisController.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/routes/web.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/app/Ca_enregistrement_graphe_config.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/app/Http/Controllers/GraphsController.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/app/Materiel_autonome.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/resources/views/layouts/graphes.blade.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/database/factories/Stloup_pasteurisateur_standardisation_data.php</file>
+            <file>file:/C:/xampp/htdocs/cipanywhere/app/Stloup_pasteurisateur_standardisation_data.php</file>
         </group>
     </open-files>
 </project-private>

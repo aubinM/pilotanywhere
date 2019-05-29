@@ -10,7 +10,7 @@ class Ca_enregistrement extends Model {
         return $this->belongsTo('App\Materiel_autonome');
     }
     public function stloup_pasteurisateur_standardisation_data() {
-        return $this->belongsTo('App\Stloup_pasteurisateur_standardisation_data');
+        return $this->hasMany('App\Stloup_pasteurisateur_standardisation_data');
     }
 
     public function alarmes() {
