@@ -12,7 +12,7 @@ $factory->define(Stloup_pasteurisateur_standardisation_data::class, function (Fa
     
     
     return [
-        'ca_enregistrement_id' => 1,
+        'ca_enregistrement_id' => 2,
         'Debit_Envoi' => $faker->randomFloat(2, 30, 32),
         'Debit_Retour' => $faker->randomFloat(2, 40, 42),
         'Temp_Retour' => $faker->randomFloat(2, 25, 35),
@@ -25,7 +25,7 @@ $factory->define(Stloup_pasteurisateur_standardisation_data::class, function (Fa
         'Niveau_Cuve_Acide' => $faker->randomFloat(2, 4000, 6000),
         'Pression_Envoi' => $faker->randomFloat(2, 45, 55),
         'Turbidite_Retour' => $faker->randomFloat(2, 0, 1),
-        'envoi_eau_neuve' => $faker->numberBetween(0, 1),
+        'envoi_eau_neuve' => $faker->numberBetween(1, 1),
         'envoi_eau_recuperee' => $faker->numberBetween(0, 1),
         'envoi_acide' => $faker->numberBetween(0, 1),
         'envoi_soude' => $faker->numberBetween(0, 1),
