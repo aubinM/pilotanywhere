@@ -73,17 +73,31 @@
                     }
                     ?>
                     <?php
-                    $y = -1;
+
+                    function random_color_part() {
+                        return str_pad(dechex(mt_rand(0, 255)), 2, '0', STR_PAD_LEFT);
+                    }
+
+                    function random_color() {
+                        return random_color_part() . random_color_part() . random_color_part();
+                    }
+
+                    echo
+
+                    $y = 0;
                     $all = null;
                     foreach ($materiels as $config) {
                         $code = $config->code;
 
 
 
+
                         if ($config->type == 2) {
-                            $all.= "name: '" . $config->name . "',";
-                            $all.= "pointWidth: 5,";
-                            $all.= "data: [";
+                            $color = random_color();
+                            $all .= "name: '" . $config->name . "',";
+                            $all .= "pointWidth: 5,";
+                            $all .= "color: '#" . $color . "',";
+                            $all .= "data: [";
                             $date_debut = null;
                             $date_fin = null;
                             $date_fin_ok = false;
@@ -109,19 +123,18 @@
                                     $date_fin = $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde;
                                     $date_fin_ok = true;
 
-                                    $all.= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . "},";
+                                    $all .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . ",color: '#" . $color . "' },";
                                     $date_debut = null;
                                 }
                             }
                             if (is_null($date_fin)) {
                                 $date_fin = $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde;
-                                $all.= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . "}";
+                                $all .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . "," . "color: '#" . $color . "'," . "}";
                             }
-                            $all.= "]},{";
+                            $all .= "]},{";
                         }
-                        
                     }
-                    echo $all = rtrim($all ,'{');
+                    $all = rtrim($all, '{');
                     ?>
 
                     <div id="container1" style="width:100%; height:400px;"></div>
@@ -130,178 +143,228 @@
                     <script>
 
 Highcharts.setOptions({
-    lang: {
-        months: [
-            'Janvier', 'Février', 'Mars', 'Avril',
-            'Mai', 'Juin', 'Juillet', 'Août',
-            'Septembre', 'Octobre', 'Novembre', 'Décembre'
-        ],
+lang: {
+months: [
+        'Janvier', 'Février', 'Mars', 'Avril',
+        'Mai', 'Juin', 'Juillet', 'Août',
+        'Septembre', 'Octobre', 'Novembre', 'Décembre'
+],
         weekdays: [
-            'Dimanche', 'Lundi', 'Mardi', 'Mercredi',
-            'Jeudi', 'Vendredi', 'Samedi'
+                'Dimanche', 'Lundi', 'Mardi', 'Mercredi',
+                'Jeudi', 'Vendredi', 'Samedi'
         ],
         shortMonths: ["Jan", "Fev", "Mar", "Avr", "Mai", "Juin", "Juil", "Aout", "Sep", "Oct", "Nov", "Dec"]
-    }
+}
 });
-
-
 var chart1 = new Highcharts.Chart({
-    chart: {
-        renderTo: 'container1',
+chart: {
+renderTo: 'container1',
         zoomType: 'x'
-    },
-    title: {
+},
+        title: {
         text: 'Run ' + <?php echo $enregistrement->id ?>
-    },
-    subtitle: {
+        },
+        subtitle: {
         text: document.ontouchstart === undefined ?
                 'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
-    },
-    xAxis: {
-        type: 'datetime'
-    },
-    yAxis: {
-        title: {
-            text: 'Valeur'
-        }
-    },
-    legend: {
-        layout: 'vertical',
-        align: 'right',
-        verticalAlign: 'middle'
-    },
-    plotOptions: {
-        series: {
-            marker: {
-                enabled: false
-            }
-        }
-    }, tooltip: {
-        crosshairs: [true],
-        shared: true
-    },
-
-    series: [{
-
-            name: 'Debit Envoi',
-            data: [
-<?php echo $debit_envoi; ?>
-            ]
-        }, {
-
-            name: 'Debit Retour',
-            data: [
-<?php echo $debit_retour; ?>
-            ]
-        }, {
-
-            name: 'Conductivite Retour',
-            data: [
-<?php echo $conductivite_retour; ?>
-            ]
-        }, {
-
-            name: 'Temp Retour',
-            data: [
-<?php echo $temp_retour; ?>
-            ]
-        }, {
-
-            name: 'Temp Cuve Soude',
-            data: [
-<?php echo $temp_cuve_soude; ?>
-            ]
-        }, {
-
-            name: 'Conductivite Cuve Soude',
-            data: [
-<?php echo $conductivite_cuve_soude; ?>
-            ]
-        }, {
-
-            name: 'Niveau Cuve Soude',
-            data: [
-<?php echo $niveau_cuve_soude; ?>
-            ]
-        }, {
-
-            name: 'Temp Cuve Acide',
-            data: [
-<?php echo $temp_cuve_acide; ?>
-            ]
-        }, {
-
-            name: 'Conductivite Cuve Acide',
-            data: [
-<?php echo $conductivite_cuve_acide; ?>
-            ]
-        }, {
-
-            name: 'Niveau Cuve Acide',
-            data: [
-<?php echo $niveau_cuve_acide; ?>
-            ]
-        }, {
-
-            name: 'Pression Envoi',
-            data: [
-<?php echo $pression_envoi; ?>
-            ]
-        }, {
-
-            name: 'Turbidite Retour',
-            data: [
-<?php echo $turbidite_retour; ?>
-            ]
-        }],
-    exporting: {
-        enabled: true,
-        sourceWidth: 2000,
-        sourceHeight: 200,
-        // scale: 2 (default)
-        chartOptions: {
-            subtitle: null
-        }
-    }
-
-});
-
-var chart2 = new Highcharts.chart({
-    chart: {
-        renderTo: 'container2',
-        type: 'xrange'
-    },
-    title: {
-        text: 'Highcharts X-range'
-    },
-    xAxis: {
-        type: 'datetime'
-    },
-    yAxis: {
-        title: {
-            text: ''
         },
-        categories: [''],
-        reversed: true
-    },
-    legend: {
+        xAxis: {
+        type: 'datetime',
+                labels: {
+                enabled: false
+                }
+        },
+        yAxis: {
+        title: {
+        text: 'Valeur'
+        },
+                gridLineWidth: 0,
+                minorGridLineWidth: 0,
+        },
+        legend: {
         layout: 'vertical',
-        align: 'right',
-        verticalAlign: 'middle'
-    }, tooltip: {
-        crosshairs: [true],
+                align: 'right',
+                verticalAlign: 'middle'
+        },
+        plotOptions: {
+        series: {
+        marker: {
+        enabled: false
+        }
+        }
+        }, tooltip: {
+crosshairs: [true],
         shared: true
-    },
-     series: [{
-        <?php echo $all; ?>
-    ]
+},
+        series: [{
 
-            
+        name: 'Debit Envoi',
+                data: [
+<?php echo $debit_envoi; ?>
+                ]
+        }, {
 
+        name: 'Debit Retour',
+                data: [
+<?php echo $debit_retour; ?>
+                ]
+        }, {
+
+        name: 'Conductivite Retour',
+                data: [
+<?php echo $conductivite_retour; ?>
+                ]
+        }, {
+
+        name: 'Temp Retour',
+                data: [
+<?php echo $temp_retour; ?>
+                ]
+        }, {
+
+        name: 'Temp Cuve Soude',
+                data: [
+<?php echo $temp_cuve_soude; ?>
+                ]
+        }, {
+
+        name: 'Conductivite Cuve Soude',
+                data: [
+<?php echo $conductivite_cuve_soude; ?>
+                ]
+        }, {
+
+        name: 'Niveau Cuve Soude',
+                data: [
+<?php echo $niveau_cuve_soude; ?>
+                ]
+        }, {
+
+        name: 'Temp Cuve Acide',
+                data: [
+<?php echo $temp_cuve_acide; ?>
+                ]
+        }, {
+
+        name: 'Conductivite Cuve Acide',
+                data: [
+<?php echo $conductivite_cuve_acide; ?>
+                ]
+        }, {
+
+        name: 'Niveau Cuve Acide',
+                data: [
+<?php echo $niveau_cuve_acide; ?>
+                ]
+        }, {
+
+        name: 'Pression Envoi',
+                data: [
+<?php echo $pression_envoi; ?>
+                ]
+        }, {
+
+        name: 'Turbidite Retour',
+                data: [
+<?php echo $turbidite_retour; ?>
+                ]
+        }],
+        exporting: {
+        enabled: true,
+                sourceWidth: 2000,
+                sourceHeight: 200,
+                // scale: 2 (default)
+                chartOptions: {
+                subtitle: null
+                }
+        }
 
 });
+(function(H) {
+H.Legend.prototype.getAllItems = function () {
+var allItems = [];
+H.each(this.chart.series, function (series) {
+var seriesOptions = series && series.options;
+if (series.type === 'xrange') {
+series.color = series.userOptions.color
+        }
+// Handle showInLegend. If the series is linked to another series,
+// defaults to false.
+if (series && H.pick(
+        seriesOptions.showInLegend,
+        !H.defined(seriesOptions.linkedTo) ? undefined : false, true
+        )) {
 
-                 </script>
+// Use points or series for the legend item depending on
+// legendType
+allItems = allItems.concat(
+        series.legendItems ||
+        (
+                seriesOptions.legendType === 'point' ?
+                series.data :
+                series
+                )
+        );
+}
+});
+H.fireEvent(this, 'afterGetAllItems', { allItems: allItems });
+return allItems;
+}
+})(Highcharts)
+
+        var chart2 = new Highcharts.chart({
+        chart: {
+        renderTo: 'container2',
+                height: 400,
+                type: 'xrange',
+                events: {
+                load: function(event) {
+                $('.highcharts-legend-item rect').attr('height', '2').attr('y', '10');
+                }
+                }
+        },
+                title: {
+                text: ''
+                },
+                xAxis: {
+                type: 'datetime',
+                        tickInterval: 1000 * 60 * 15
+                },
+                yAxis: {
+                gridLineWidth: 0,
+                        minorGridLineWidth: 0,
+                        labels: {
+                        enabled: false
+                        },
+                        categories: [''],
+                        reversed: true
+                },
+                plotOptions: {
+                series: {
+                colorByPoint: true,
+                        allowPointSelect: true,
+                }
+                },
+                legend: {
+                symbolHeight: 11,
+                        symbolWidth: 1,
+                        symbolRadius: 12,
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle'
+                }, tooltip: {
+        crosshairs: [true]
+        },
+                series: [{
+<?php echo $all; ?>
+                ]
+
+
+
+
+                });
+
+                    </script>
 
 
 
