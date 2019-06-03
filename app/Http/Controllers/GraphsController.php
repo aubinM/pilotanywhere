@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Ca_enregistrement;
+use App\Materiel_autonome;
+use App\Ca_enregistrement_graphe_config;
 
 class GraphsController extends Controller
 {
@@ -16,9 +18,10 @@ class GraphsController extends Controller
     {
         //Faire dernier par date debut plus tard
         $enregistrement = Ca_enregistrement::all()->last();
+        $materiels = \App\Materiel_autonome::all();
         
 
-        return view('layouts.graphes',compact('enregistrement'));
+        return view('layouts.graphes',compact('enregistrement','materiels'));
     }
 
     /**
@@ -52,9 +55,10 @@ class GraphsController extends Controller
     {
         $enregistrement = Ca_enregistrement::find($id);
         $enregistrement_last_id = Ca_enregistrement::all()->last()->id;
+        $materiels = Ca_enregistrement::all()->last()->materiel_autonome->Ca_enregistrement_graphe_config;
  
 
-         return view('layouts.graphes', compact('enregistrement','enregistrement_last_id'));
+         return view('layouts.graphes', compact('enregistrement','enregistrement_last_id','materiels'));
     }
 
     /**
