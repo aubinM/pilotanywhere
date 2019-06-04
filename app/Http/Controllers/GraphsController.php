@@ -18,7 +18,8 @@ class GraphsController extends Controller
     {
         //Faire dernier par date debut plus tard
         $enregistrement = Ca_enregistrement::all()->last();
-        $materiels = \App\Materiel_autonome::all();
+        $enregistrement_last_id = Ca_enregistrement::all()->last()->id;
+        $materiels = Ca_enregistrement::all()->last()->materiel_autonome->Ca_enregistrement_graphe_config;
         
 
         return view('layouts.graphes',compact('enregistrement','materiels'));

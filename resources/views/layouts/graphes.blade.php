@@ -82,10 +82,16 @@
                         return random_color_part() . random_color_part() . random_color_part();
                     }
 
-                    echo
+                    
 
                     $y = 0;
                     $all = null;
+                    $annee = null;
+                    $mois = null;
+                    $jour = null;
+                    $heure = null;
+                    $minute = null;
+                    $seconde = null;
                     foreach ($materiels as $config) {
                         $code = $config->code;
 
@@ -102,6 +108,7 @@
                             $date_fin = null;
                             $date_fin_ok = false;
                             $y ++;
+                            
 
 
                             foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
@@ -135,6 +142,7 @@
                         }
                     }
                     $all = rtrim($all, '{');
+                    
                     ?>
 
                     <div id="container1" style="width:100%; height:400px;"></div>
@@ -148,19 +156,19 @@ months: [
         'Janvier', 'Février', 'Mars', 'Avril',
         'Mai', 'Juin', 'Juillet', 'Août',
         'Septembre', 'Octobre', 'Novembre', 'Décembre'
-],
+        ],
         weekdays: [
                 'Dimanche', 'Lundi', 'Mardi', 'Mercredi',
                 'Jeudi', 'Vendredi', 'Samedi'
         ],
         shortMonths: ["Jan", "Fev", "Mar", "Avr", "Mai", "Juin", "Juil", "Aout", "Sep", "Oct", "Nov", "Dec"]
-}
+        }
 });
 var chart1 = new Highcharts.Chart({
 chart: {
 renderTo: 'container1',
         zoomType: 'x'
-},
+        },
         title: {
         text: 'Run ' + <?php echo $enregistrement->id ?>
         },
@@ -195,7 +203,7 @@ renderTo: 'container1',
         }, tooltip: {
 crosshairs: [true],
         shared: true
-},
+        },
         series: [{
 
         name: 'Debit Envoi',
@@ -280,37 +288,37 @@ crosshairs: [true],
         }
 
 });
-(function(H) {
-H.Legend.prototype.getAllItems = function () {
-var allItems = [];
-H.each(this.chart.series, function (series) {
-var seriesOptions = series && series.options;
-if (series.type === 'xrange') {
-series.color = series.userOptions.color
-        }
-// Handle showInLegend. If the series is linked to another series,
-// defaults to false.
-if (series && H.pick(
-        seriesOptions.showInLegend,
-        !H.defined(seriesOptions.linkedTo) ? undefined : false, true
-        )) {
-
-// Use points or series for the legend item depending on
-// legendType
-allItems = allItems.concat(
-        series.legendItems ||
-        (
-                seriesOptions.legendType === 'point' ?
-                series.data :
-                series
-                )
-        );
-}
-});
-H.fireEvent(this, 'afterGetAllItems', { allItems: allItems });
-return allItems;
-}
-})(Highcharts)
+//(function(H) {
+//H.Legend.prototype.getAllItems = function () {
+//var allItems = [];
+//H.each(this.chart.series, function (series) {
+//var seriesOptions = series && series.options;
+//if (series.type === 'xrange') {
+//series.color = series.userOptions.color
+//}
+//// Handle showInLegend. If the series is linked to another series,
+//// defaults to false.
+//if (series && H.pick(
+//        seriesOptions.showInLegend,
+//        !H.defined(seriesOptions.linkedTo) ? undefined : false, true
+//        )) {
+//
+//// Use points or series for the legend item depending on
+//// legendType
+//allItems = allItems.concat(
+//        series.legendItems ||
+//        (
+//                seriesOptions.legendType === 'point' ?
+//                series.data :
+//                series
+//                )
+//        );
+//}
+//});
+//H.fireEvent(this, 'afterGetAllItems', { allItems: allItems });
+//return allItems;
+//}
+//})(Highcharts)
 
         var chart2 = new Highcharts.chart({
         chart: {
