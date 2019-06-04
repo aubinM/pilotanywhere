@@ -288,42 +288,44 @@ crosshairs: [true],
         }
 
 });
-//(function(H) {
-//H.Legend.prototype.getAllItems = function () {
-//var allItems = [];
-//H.each(this.chart.series, function (series) {
-//var seriesOptions = series && series.options;
-//if (series.type === 'xrange') {
-//series.color = series.userOptions.color
-//}
-//// Handle showInLegend. If the series is linked to another series,
-//// defaults to false.
-//if (series && H.pick(
-//        seriesOptions.showInLegend,
-//        !H.defined(seriesOptions.linkedTo) ? undefined : false, true
-//        )) {
-//
-//// Use points or series for the legend item depending on
-//// legendType
-//allItems = allItems.concat(
-//        series.legendItems ||
-//        (
-//                seriesOptions.legendType === 'point' ?
-//                series.data :
-//                series
-//                )
-//        );
-//}
-//});
-//H.fireEvent(this, 'afterGetAllItems', { allItems: allItems });
-//return allItems;
-//}
-//})(Highcharts)
+(function(H) {
+H.Legend.prototype.getAllItems = function () {
+var allItems = [];
+H.each(this.chart.series, function (series) {
+var seriesOptions = series && series.options;
+if (series.type === 'xrange') {
+series.color = series.userOptions.color
+}
+// Handle showInLegend. If the series is linked to another series,
+// defaults to false.
+if (series && H.pick(
+        seriesOptions.showInLegend,
+        !H.defined(seriesOptions.linkedTo) ? undefined : false, true
+        )) {
+
+// Use points or series for the legend item depending on
+// legendType
+allItems = allItems.concat(
+        series.legendItems ||
+        (
+                seriesOptions.legendType === 'point' ?
+                series.data :
+                series
+                )
+        );
+}
+});
+H.fireEvent(this, 'afterGetAllItems', { allItems: allItems });
+return allItems;
+}
+})(Highcharts)
+
+Highcharts.seriesTypes.column.prototype.drawLegendSymbol = 
+     Highcharts.seriesTypes.line.prototype.drawLegendSymbol;
 
         var chart2 = new Highcharts.chart({
         chart: {
         renderTo: 'container2',
-                height: 400,
                 type: 'xrange',
                 events: {
                 load: function(event) {
@@ -355,7 +357,7 @@ crosshairs: [true],
                 },
                 legend: {
                 symbolHeight: 11,
-                        symbolWidth: 1,
+                        symbolWidth: 10,
                         symbolRadius: 12,
                         layout: 'vertical',
                         align: 'right',
@@ -371,6 +373,8 @@ crosshairs: [true],
 
 
                 });
+                
+                
 
                     </script>
 
