@@ -6,6 +6,7 @@
 <!-- optional -->
 <script src="http://code.highcharts.com/modules/offline-exporting.js"></script>
 <script src="http://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/data.js"></script>
 
 <body id="page-top">
 
@@ -68,12 +69,30 @@
                             foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
                                 $date = new DateTime($datas->_date);
 
+
                                 $annee = $date->format('Y');
                                 $mois = $date->format('m') - 1;
+
                                 $jour = $date->format('d');
                                 $heure = $date->format('H');
                                 $minute = $date->format('i');
                                 $seconde = $date->format('s');
+                                if ($mois[0] == "0") {
+                                    $mois = substr($mois, 1);
+                                }
+                                if ($jour[0] == "0") {
+                                    $jour = substr($jour, 1);
+                                }
+                                if ($heure[0] == "0") {
+                                    $heure = substr($heure, 1);
+                                }
+                                if ($minute[0] == "0") {
+                                    $minute = substr($minute, 1);
+                                }
+                                if ($seconde[0] == "0") {
+                                    $seconde = substr($seconde, 1);
+                                }
+
                                 if ($datas->$code == 1 && is_null($date_debut)) {
                                     $date_debut = $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde;
                                     $date_fin = null;
@@ -90,7 +109,7 @@
                             }
                             if (is_null($date_fin)) {
                                 $date_fin = $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde;
-                                $sequenceSeries .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . "," . "color: '#" . $color ."'}";
+                                $sequenceSeries .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . "," . "color: '#" . $color . "'}";
                             }
                             $sequenceSeries .= "],}, {";
                         } else if ($config->type == 1) {
@@ -108,6 +127,21 @@
                                 $heure = $date->format('H');
                                 $minute = $date->format('i');
                                 $seconde = $date->format('s');
+                                if ($mois[0] == "0") {
+                                    $mois = substr($mois, 1);
+                                }
+                                if ($jour[0] == "0") {
+                                    $jour = substr($jour, 1);
+                                }
+                                if ($heure[0] == "0") {
+                                    $heure = substr($heure, 1);
+                                }
+                                if ($minute[0] == "0") {
+                                    $minute = substr($minute, 1);
+                                }
+                                if ($seconde[0] == "0") {
+                                    $seconde = substr($seconde, 1);
+                                }
                                 $analogiqueSeries .= "[Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")," . $datas->$code . "],";
                             }
                             $analogiqueSeries .= "]},{";
@@ -116,173 +150,279 @@
                     $sequenceSeries = rtrim($sequenceSeries, ',}, { ');
                     $analogiqueSeries = rtrim($analogiqueSeries, '},{');
                     //echo $sequenceSeries;
-
                     ?>
+                    <pre id="whereToPrint"></pre>
 
-                    <div id="container1" style="width:100%; height:400px;"></div>
+                    <div id="container" style="width:100%; height:400px;"></div>
                     <div id="container2" style="width:100%; height:400px;"></div>
 
                     <script>
-                        
-                        
+
+
 
 Highcharts.setOptions({
-lang: {
-months: [
-        'Janvier', 'Février', 'Mars', 'Avril',
-        'Mai', 'Juin', 'Juillet', 'Août',
-        'Septembre', 'Octobre', 'Novembre', 'Décembre'
+    lang: {
+        months: [
+            'Janvier', 'Février', 'Mars', 'Avril',
+            'Mai', 'Juin', 'Juillet', 'Août',
+            'Septembre', 'Octobre', 'Novembre', 'Décembre'
         ],
         weekdays: [
-                'Dimanche', 'Lundi', 'Mardi', 'Mercredi',
-                'Jeudi', 'Vendredi', 'Samedi'
+            'Dimanche', 'Lundi', 'Mardi', 'Mercredi',
+            'Jeudi', 'Vendredi', 'Samedi'
         ],
         shortMonths: ["Jan", "Fev", "Mar", "Avr", "Mai", "Juin", "Juil", "Aout", "Sep", "Oct", "Nov", "Dec"]
-        }
+    }
 });
-var chart1 = new Highcharts.Chart({
-chart: {
-renderTo: 'container1',
-        zoomType: 'x'
-        },
-        title: {
-        text: 'Run ' + <?php echo $enregistrement->id ?>
-        },
-        subtitle: {
-        text: document.ontouchstart === undefined ?
-                'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
-        },
-        xAxis: {
-        type: 'datetime',
-                labels: {
-                enabled: false
-                }
-        },
-        yAxis: {
-        title: {
-        text: 'Valeur'
-        },
-                gridLineWidth: 0,
-                minorGridLineWidth: 0,
-        },
-        legend: {
-        layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'middle'
-        },
 
-    plotOptions: {
-      series: {
-      stickyTracking: false,
-        marker: {
-          enabled: false
-        }
-      }
-    }, tooltip: {
-crosshairs: [true],
-        shared: true
-        },
-        series: [{
-<?php echo $analogiqueSeries; ?>
-    }],
-                exporting: {
-                enabled: true,
-                        sourceWidth: 2000,
-                        sourceHeight: 200,
-                        // scale: 2 (default)
-                        chartOptions: {
-                        subtitle: null
-                        }
-                }
-
-        });
-        (function(H) {
-        H.Legend.prototype.getAllItems = function () {
+(function (H) {
+    H.Legend.prototype.getAllItems = function () {
         var allItems = [];
         H.each(this.chart.series, function (series) {
-        var seriesOptions = series && series.options;
-        if (series.type === 'xrange') {
-        series.color = series.userOptions.color
-        }
+            var seriesOptions = series && series.options;
+            if (series.type === 'xrange') {
+                series.color = series.userOptions.color
+            }
 // Handle showInLegend. If the series is linked to another series,
 // defaults to false.
-        if (series && H.pick(
-                seriesOptions.showInLegend,
-                !H.defined(seriesOptions.linkedTo) ? undefined : false, true
-                )) {
+            if (series && H.pick(
+                    seriesOptions.showInLegend,
+                    !H.defined(seriesOptions.linkedTo) ? undefined : false, true
+                    )) {
 
 // Use points or series for the legend item depending on
 // legendType
-        allItems = allItems.concat(
-                series.legendItems ||
-                (
-                        seriesOptions.legendType === 'point' ?
-                        series.data :
-                        series
-                        )
-                );
-        }
+                allItems = allItems.concat(
+                        series.legendItems ||
+                        (
+                                seriesOptions.legendType === 'point' ?
+                                series.data :
+                                series
+                                )
+                        );
+            }
         });
-        H.fireEvent(this, 'afterGetAllItems', { allItems: allItems });
+        H.fireEvent(this, 'afterGetAllItems', {allItems: allItems});
         return allItems;
-        }
-        })(Highcharts)
+    }
+})(Highcharts)
 
-                Highcharts.seriesTypes.column.prototype.drawLegendSymbol =
-                Highcharts.seriesTypes.line.prototype.drawLegendSymbol;
-        var chart2 = new Highcharts.chart({
-        chart: {
-        renderTo: 'container2',
-                type: 'xrange',
-                events: {
-                load: function(event) {
-                $('.highcharts-legend-item rect').attr('height', '2').attr('y', '10');
+Highcharts.seriesTypes.column.prototype.drawLegendSymbol =
+        Highcharts.seriesTypes.line.prototype.drawLegendSymbol;
+
+
+
+
+/*
+ The purpose of this demo is to demonstrate how multiple charts on the same page
+ can be linked through DOM and Highcharts events and API methods. It takes a
+ standard Highcharts config with a small variation for each data set, and a
+ mouse/touch event handler to bind the charts together.
+ */
+
+
+/**
+ * In order to synchronize tooltips and crosshairs, override the
+ * built-in events with handlers defined on the parent element.
+ */
+['mousemove', 'touchmove', 'touchstart'].forEach(function (eventType) {
+    document.getElementById('container').addEventListener(
+            eventType,
+            function (e) {
+                var chart,
+                        point,
+                        i,
+                        event;
+
+                for (i = 0; i < Highcharts.charts.length; i = i + 1) {
+                    chart = Highcharts.charts[i];
+                    // Find coordinates within the chart
+                    event = chart.pointer.normalize(e);
+                    // Get the hovered point
+                    point = chart.series[0].searchPoint(event, true);
+
+                    if (point) {
+                        point.highlight(e);
+                    }
                 }
+            }
+    );
+});
+
+/**
+ * Override the reset function, we don't need to hide the tooltips and
+ * crosshairs.
+ */
+Highcharts.Pointer.prototype.reset = function () {
+    return undefined;
+};
+
+/**
+ * Highlight a point by showing tooltip, setting hover state and draw crosshair
+ */
+Highcharts.Point.prototype.highlight = function (event) {
+    event = this.series.chart.pointer.normalize(event);
+    this.onMouseOver(); // Show the hover marker
+    this.series.chart.tooltip.refresh(this); // Show the tooltip
+    this.series.chart.xAxis[0].drawCrosshair(event, this); // Show the crosshair
+};
+
+/**
+ * Synchronize zooming through the setExtremes event handler.
+ */
+function syncExtremes(e) {
+    var thisChart = this.chart;
+
+    if (e.trigger !== 'syncExtremes') { // Prevent feedback loop
+        Highcharts.each(Highcharts.charts, function (chart) {
+            if (chart !== thisChart) {
+                if (chart.xAxis[0].setExtremes) { // It is null while updating
+                    chart.xAxis[0].setExtremes(
+                            e.min,
+                            e.max,
+                            undefined,
+                            false,
+                            {trigger: 'syncExtremes'}
+                    );
                 }
-        },
-                title: {
-                text: ''
-                },
-                xAxis: {
-                type: 'datetime',
+            }
+        });
+    }
+}
+
+// Get the data. The contents of the data file can be viewed at
+Highcharts.ajax({
+    url: 'https://cdn.jsdelivr.net/gh/highcharts/highcharts@v7.0.0/samples/data/activity.json',
+    dataType: 'text',
+    success: function (activity) {
+
+        activity = JSON.parse(activity);
+        var i = 0;
+        for (var i = 0; i < 2; i++) {
+
+            console.log(i);
+            // Add X values
+//            dataset.data = Highcharts.map(dataset.data, function (val, j) {
+//                return [activity.xData[j], val];
+//            });
+            //document.getElementById("whereToPrint").innerHTML = JSON.stringify(dataset.data, null, 4);
+
+            var chartDiv = document.createElement('div');
+            chartDiv.className = 'chart';
+            document.getElementById('container').appendChild(chartDiv);
+
+            if (i == 1) {
+                Highcharts.chart(chartDiv, {
+                    chart: {
+                        renderTo: 'container2',
+                        type: 'xrange',
+                        zoomType: 'x'
+
+                    },
+                    title: {
+                        text: ''
+                    },
+                    xAxis: {
+                        type: 'datetime',
                         tickInterval: 1000 * 60 * 15
-                },
-                yAxis: {
-                gridLineWidth: 0,
+                    },
+                    yAxis: {
+                        
+                        gridLineWidth: 0,
                         minorGridLineWidth: 0,
                         labels: {
-                        enabled: false
+                            enabled: false
                         },
                         categories: [''],
                         reversed: true
-                },
-                plotOptions: {
-                series: {
-                colorByPoint: true,
-                        allowPointSelect: true,
-                }
-                },
-                legend: {
-                symbolHeight: 11,
+                    },
+                    plotOptions: {
+                        series: {
+                            colorByPoint: true,
+                            allowPointSelect: true,
+                        }
+                    },
+                    legend: {
+                        symbolHeight: 11,
                         symbolWidth: 10,
                         symbolRadius: 12,
                         layout: 'vertical',
                         align: 'right',
                         verticalAlign: 'middle'
-                }, tooltip: {
-        crosshairs: [true]
-                },
-                series: [{
-            <?php echo $sequenceSeries; ?>
-                    }]
+                    }, tooltip: {
+                        crosshairs: [true]
+                    },
+                    series: [{
+<?php echo $sequenceSeries; ?>
+                        }]
+                });
+            } else {
+                Highcharts.chart(chartDiv, {
 
-
+                    chart: {
+                        renderTo: 'container2',
+                        zoomType: 'x'
+                    },
+                    title: {
+                        text: 'Run ' + <?php echo $enregistrement->id ?>
+                    },
+                    subtitle: {
+                        text: document.ontouchstart === undefined ?
+                                'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
+                    },
+                    xAxis: {
+                        type: 'datetime',
+                        labels: {
+                            enabled: false
+                        }
+                    },
+                    yAxis: {
+                        title: {
+                            text: ''
+                        },
+                        gridLineWidth: 0,
+                        minorGridLineWidth: 0,
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle'
+                    },
+                    plotOptions: {
+                        series: {enabled: false,
+                            marker: {
+                                enabled: false
+                            }
+                        }
+                    }, tooltip: {
+                        crosshairs: [true],
+                        shared: true
+                    },
+                    series: [{
+<?php echo $analogiqueSeries; ?>
+                        }],
+                    exporting: {
+                        enabled: true,
+                        sourceWidth: 2000,
+                        sourceHeight: 200,
+                        // scale: 2 (default)
+                        chartOptions: {
+                            subtitle: null
+                        }
+                    }
 
 
                 });
-       
-                
-                
+
+
+            }
+        }
+    }
+});
+
+
+
+
 
 
 
