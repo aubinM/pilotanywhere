@@ -90,9 +90,9 @@
                             }
                             if (is_null($date_fin)) {
                                 $date_fin = $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde;
-                                $sequenceSeries .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . "," . "color: '#" . $color . "'," . "}";
+                                $sequenceSeries .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . "," . "color: '#" . $color ."'}";
                             }
-                            $sequenceSeries .= "]},{";
+                            $sequenceSeries .= "],}, {";
                         } else if ($config->type == 1) {
                             $analogiqueSeries .= "name: '" . $config->name . "',";
                             $analogiqueSeries .= "marker:{states:{hover:{enabled:false}}},";
@@ -113,9 +113,9 @@
                             $analogiqueSeries .= "]},{";
                         }
                     }
-                    $sequenceSeries = rtrim($sequenceSeries, '{');
+                    $sequenceSeries = rtrim($sequenceSeries, ',}, { ');
                     $analogiqueSeries = rtrim($analogiqueSeries, '},{');
-                    //echo $analogiqueSeries;
+                    //echo $sequenceSeries;
 
                     ?>
 
@@ -123,6 +123,8 @@
                     <div id="container2" style="width:100%; height:400px;"></div>
 
                     <script>
+                        
+                        
 
 Highcharts.setOptions({
 lang: {
@@ -271,13 +273,16 @@ crosshairs: [true],
         crosshairs: [true]
                 },
                 series: [{
-<?php echo $sequenceSeries; ?>
-                ]
+            <?php echo $sequenceSeries; ?>
+                    }]
 
 
 
 
                 });
+       
+                
+                
 
 
 
