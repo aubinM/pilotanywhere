@@ -95,6 +95,7 @@
                             $sequenceSeries .= "]},{";
                         } else if ($config->type == 1) {
                             $analogiqueSeries .= "name: '" . $config->name . "',";
+                            $analogiqueSeries .= "marker:{states:{hover:{enabled:false}}},";
                             $analogiqueSeries .= "data: [";
 
 
@@ -167,13 +168,15 @@ renderTo: 'container1',
                 align: 'right',
                 verticalAlign: 'middle'
         },
-        plotOptions: {
-        series: { enabled: false,
+
+    plotOptions: {
+      series: {
+      stickyTracking: false,
         marker: {
-        enabled: false
+          enabled: false
         }
-        }
-        }, tooltip: {
+      }
+    }, tooltip: {
 crosshairs: [true],
         shared: true
         },
