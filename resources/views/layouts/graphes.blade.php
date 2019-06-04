@@ -31,48 +31,15 @@
                     </div>
 
                     <?php
-                    $matos = array();
-                    foreach ($materiels as $config) {
-                        if ($config->type == 2) {
-                            array_push($matos, $config->name);
-                        }
-                    }
-
-
-                    $debit_envoi = "";
-                    $debit_retour = "";
-                    $temp_retour = "";
-                    $conductivite_retour = "";
-                    $temp_cuve_soude = "";
-                    $conductivite_cuve_soude = "";
-                    $niveau_cuve_soude = "";
-                    $temp_cuve_acide = "";
-                    $conductivite_cuve_acide = "";
-                    $niveau_cuve_acide = "";
-                    $pression_envoi = "";
-                    $turbidite_retour = "";
-
-                    foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
-                        $date = new DateTime($datas->_date);
-                        $annee = $date->format('Y');
-                        $mois = $date->format('m') - 1;
-                        $jour = $date->format('d');
-                        $heure = $date->format('H');
-                        $minute = $date->format('i');
-                        $seconde = $date->format('s');
-                        $debit_envoi .= "[Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")," . $datas->Debit_Envoi . "],";
-                        $debit_retour .= "[Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")," . $datas->Debit_Retour . "],";
-                        $conductivite_retour .= "[Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")," . $datas->Conductivite_Retour . "],";
-                        $temp_cuve_soude .= "[Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")," . $datas->Temp_Cuve_Soude . "],";
-                        $conductivite_cuve_soude .= "[Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")," . $datas->Conductivite_Cuve_Soude . "],";
-                        $niveau_cuve_soude .= "[Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")," . $datas->Niveau_Cuve_Soude . "],";
-                        $temp_cuve_acide .= "[Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")," . $datas->Temp_Cuve_Acide . "],";
-                        $conductivite_cuve_acide .= "[Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")," . $datas->Conductivite_Cuve_Acide . "],";
-                        $niveau_cuve_acide .= "[Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")," . $datas->Niveau_Cuve_Acide . "],";
-                        $turbidite_retour .= "[Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")," . $datas->Turbidite_Retour . "],";
-                    }
-                    ?>
-                    <?php
+                    $y = 0;
+                    $analogiqueSeries = null;
+                    $sequenceSeries = null;
+                    $annee = null;
+                    $mois = null;
+                    $jour = null;
+                    $heure = null;
+                    $minute = null;
+                    $seconde = null;
 
                     function random_color_part() {
                         return str_pad(dechex(mt_rand(0, 255)), 2, '0', STR_PAD_LEFT);
@@ -82,33 +49,20 @@
                         return random_color_part() . random_color_part() . random_color_part();
                     }
 
-                    
-
-                    $y = 0;
-                    $all = null;
-                    $annee = null;
-                    $mois = null;
-                    $jour = null;
-                    $heure = null;
-                    $minute = null;
-                    $seconde = null;
                     foreach ($materiels as $config) {
                         $code = $config->code;
 
-
-
-
                         if ($config->type == 2) {
                             $color = random_color();
-                            $all .= "name: '" . $config->name . "',";
-                            $all .= "pointWidth: 5,";
-                            $all .= "color: '#" . $color . "',";
-                            $all .= "data: [";
+                            $sequenceSeries .= "name: '" . $config->name . "',";
+                            $sequenceSeries .= "pointWidth: 5,";
+                            $sequenceSeries .= "color: '#" . $color . "',";
+                            $sequenceSeries .= "data: [";
                             $date_debut = null;
                             $date_fin = null;
                             $date_fin_ok = false;
                             $y ++;
-                            
+
 
 
                             foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
@@ -130,19 +84,38 @@
                                     $date_fin = $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde;
                                     $date_fin_ok = true;
 
-                                    $all .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . ",color: '#" . $color . "' },";
+                                    $sequenceSeries .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . ",color: '#" . $color . "' },";
                                     $date_debut = null;
                                 }
                             }
                             if (is_null($date_fin)) {
                                 $date_fin = $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde;
-                                $all .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . "," . "color: '#" . $color . "'," . "}";
+                                $sequenceSeries .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . "," . "color: '#" . $color . "'," . "}";
                             }
-                            $all .= "]},{";
+                            $sequenceSeries .= "]},{";
+                        } else if ($config->type == 1) {
+                            $analogiqueSeries .= "name: '" . $config->name . "',";
+                            $analogiqueSeries .= "data: [";
+
+
+
+                            foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
+                                $date = new DateTime($datas->_date);
+                                $annee = $date->format('Y');
+                                $mois = $date->format('m') - 1;
+                                $jour = $date->format('d');
+                                $heure = $date->format('H');
+                                $minute = $date->format('i');
+                                $seconde = $date->format('s');
+                                $analogiqueSeries .= "[Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")," . $datas->$code . "],";
+                            }
+                            $analogiqueSeries .= "]},{";
                         }
                     }
-                    $all = rtrim($all, '{');
-                    
+                    $sequenceSeries = rtrim($sequenceSeries, '{');
+                    $analogiqueSeries = rtrim($analogiqueSeries, '},{');
+                    //echo $analogiqueSeries;
+
                     ?>
 
                     <div id="container1" style="width:100%; height:400px;"></div>
@@ -195,7 +168,7 @@ renderTo: 'container1',
                 verticalAlign: 'middle'
         },
         plotOptions: {
-        series: {
+        series: { enabled: false,
         marker: {
         enabled: false
         }
@@ -205,124 +178,53 @@ crosshairs: [true],
         shared: true
         },
         series: [{
-
-        name: 'Debit Envoi',
-                data: [
-<?php echo $debit_envoi; ?>
-                ]
-        }, {
-
-        name: 'Debit Retour',
-                data: [
-<?php echo $debit_retour; ?>
-                ]
-        }, {
-
-        name: 'Conductivite Retour',
-                data: [
-<?php echo $conductivite_retour; ?>
-                ]
-        }, {
-
-        name: 'Temp Retour',
-                data: [
-<?php echo $temp_retour; ?>
-                ]
-        }, {
-
-        name: 'Temp Cuve Soude',
-                data: [
-<?php echo $temp_cuve_soude; ?>
-                ]
-        }, {
-
-        name: 'Conductivite Cuve Soude',
-                data: [
-<?php echo $conductivite_cuve_soude; ?>
-                ]
-        }, {
-
-        name: 'Niveau Cuve Soude',
-                data: [
-<?php echo $niveau_cuve_soude; ?>
-                ]
-        }, {
-
-        name: 'Temp Cuve Acide',
-                data: [
-<?php echo $temp_cuve_acide; ?>
-                ]
-        }, {
-
-        name: 'Conductivite Cuve Acide',
-                data: [
-<?php echo $conductivite_cuve_acide; ?>
-                ]
-        }, {
-
-        name: 'Niveau Cuve Acide',
-                data: [
-<?php echo $niveau_cuve_acide; ?>
-                ]
-        }, {
-
-        name: 'Pression Envoi',
-                data: [
-<?php echo $pression_envoi; ?>
-                ]
-        }, {
-
-        name: 'Turbidite Retour',
-                data: [
-<?php echo $turbidite_retour; ?>
-                ]
-        }],
-        exporting: {
-        enabled: true,
-                sourceWidth: 2000,
-                sourceHeight: 200,
-                // scale: 2 (default)
-                chartOptions: {
-                subtitle: null
+<?php echo $analogiqueSeries; ?>
+    }],
+                exporting: {
+                enabled: true,
+                        sourceWidth: 2000,
+                        sourceHeight: 200,
+                        // scale: 2 (default)
+                        chartOptions: {
+                        subtitle: null
+                        }
                 }
-        }
 
-});
-(function(H) {
-H.Legend.prototype.getAllItems = function () {
-var allItems = [];
-H.each(this.chart.series, function (series) {
-var seriesOptions = series && series.options;
-if (series.type === 'xrange') {
-series.color = series.userOptions.color
-}
+        });
+        (function(H) {
+        H.Legend.prototype.getAllItems = function () {
+        var allItems = [];
+        H.each(this.chart.series, function (series) {
+        var seriesOptions = series && series.options;
+        if (series.type === 'xrange') {
+        series.color = series.userOptions.color
+        }
 // Handle showInLegend. If the series is linked to another series,
 // defaults to false.
-if (series && H.pick(
-        seriesOptions.showInLegend,
-        !H.defined(seriesOptions.linkedTo) ? undefined : false, true
-        )) {
+        if (series && H.pick(
+                seriesOptions.showInLegend,
+                !H.defined(seriesOptions.linkedTo) ? undefined : false, true
+                )) {
 
 // Use points or series for the legend item depending on
 // legendType
-allItems = allItems.concat(
-        series.legendItems ||
-        (
-                seriesOptions.legendType === 'point' ?
-                series.data :
-                series
-                )
-        );
-}
-});
-H.fireEvent(this, 'afterGetAllItems', { allItems: allItems });
-return allItems;
-}
-})(Highcharts)
+        allItems = allItems.concat(
+                series.legendItems ||
+                (
+                        seriesOptions.legendType === 'point' ?
+                        series.data :
+                        series
+                        )
+                );
+        }
+        });
+        H.fireEvent(this, 'afterGetAllItems', { allItems: allItems });
+        return allItems;
+        }
+        })(Highcharts)
 
-Highcharts.seriesTypes.column.prototype.drawLegendSymbol = 
-     Highcharts.seriesTypes.line.prototype.drawLegendSymbol;
-
+                Highcharts.seriesTypes.column.prototype.drawLegendSymbol =
+                Highcharts.seriesTypes.line.prototype.drawLegendSymbol;
         var chart2 = new Highcharts.chart({
         chart: {
         renderTo: 'container2',
@@ -364,17 +266,19 @@ Highcharts.seriesTypes.column.prototype.drawLegendSymbol =
                         verticalAlign: 'middle'
                 }, tooltip: {
         crosshairs: [true]
-        },
+                },
                 series: [{
-<?php echo $all; ?>
+<?php echo $sequenceSeries; ?>
                 ]
 
 
 
 
                 });
-                
-                
+
+
+
+
 
                     </script>
 
