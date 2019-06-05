@@ -7,6 +7,7 @@
 <script src="http://code.highcharts.com/modules/offline-exporting.js"></script>
 <script src="http://code.highcharts.com/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/modules/data.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
 
 <body id="page-top">
 
@@ -52,6 +53,7 @@
 
                     foreach ($materiels as $config) {
                         $code = $config->code;
+                        echo $config->name;
 
                         if ($config->type == 2) {
                             $color = random_color();
@@ -151,7 +153,6 @@
                     $analogiqueSeries = rtrim($analogiqueSeries, '},{');
                     //echo $sequenceSeries;
                     ?>
-                    <pre id="whereToPrint"></pre>
 
                     <div id="container" style="width:100%; height:400px;"></div>
                     <div id="container2" style="width:100%; height:400px;"></div>
@@ -213,212 +214,206 @@ Highcharts.seriesTypes.column.prototype.drawLegendSymbol =
 
 
 
-/*
- The purpose of this demo is to demonstrate how multiple charts on the same page
- can be linked through DOM and Highcharts events and API methods. It takes a
- standard Highcharts config with a small variation for each data set, and a
- mouse/touch event handler to bind the charts together.
- */
 
+$(function () {
+    $('#container').bind('mouseleave mouseout ', function(e) {
+    var chart,
+      point,
+      i,
+      event;
 
-/**
- * In order to synchronize tooltips and crosshairs, override the
- * built-in events with handlers defined on the parent element.
- */
-['mousemove', 'touchmove', 'touchstart'].forEach(function (eventType) {
-    document.getElementById('container').addEventListener(
-            eventType,
-            function (e) {
-                var chart,
-                        point,
-                        i,
-                        event;
+    for (i = 0; i < Highcharts.charts.length; i = i + 1) {
+      chart = Highcharts.charts[i];
+      event = chart.pointer.normalize(e.originalEvent);
+      point = chart.series[0].searchPoint(event, true);
 
-                for (i = 0; i < Highcharts.charts.length; i = i + 1) {
-                    chart = Highcharts.charts[i];
-                    // Find coordinates within the chart
-                    event = chart.pointer.normalize(e);
-                    // Get the hovered point
-                    point = chart.series[0].searchPoint(event, true);
+      point.onMouseOut(); 
+      chart.tooltip.hide(point);
+      chart.xAxis[0].hideCrosshair(); 
+    }
+  });
 
-                    if (point) {
-                        point.highlight(e);
+    /**
+     * In order to synchronize tooltips and crosshairs, override the
+     * built-in events with handlers defined on the parent element.
+     */
+    $('#container').bind('mousemove touchmove touchstart', function (e) {
+        var chart,
+                point,
+                i,
+                event;
+        for (i = 0; i < Highcharts.charts.length; i = i + 1) {
+            chart = Highcharts.charts[i];
+            event = chart.pointer.normalize(e.originalEvent); // Find coordinates within the chart
+            point = chart.series[0].searchPoint(event, true); // Get the hovered point
+
+            if (point) {
+                point.highlight(e);
+            }
+        }
+    });
+    /**
+     * Override the reset function, we don't need to hide the tooltips and crosshairs.
+     */
+    Highcharts.Pointer.prototype.reset = function () {
+        return undefined;
+    };
+    /**
+     * Highlight a point by showing tooltip, setting hover state and draw crosshair
+     */
+    Highcharts.Point.prototype.highlight = function (event) {
+        this.onMouseOver(); // Show the hover marker
+        this.series.chart.tooltip.refresh(this); // Show the tooltip
+        this.series.chart.xAxis[0].drawCrosshair(event, this); // Show the crosshair
+    };
+    /**
+     * Synchronize zooming through the setExtremes event handler.
+     */
+    function syncExtremes(e) {
+        var thisChart = this.chart;
+        if (e.trigger !== 'syncExtremes') { // Prevent feedback loop
+            Highcharts.each(Highcharts.charts, function (chart) {
+                if (chart !== thisChart) {
+                    if (chart.xAxis[0].setExtremes) { // It is null while updating
+                        chart.xAxis[0].setExtremes(e.min, e.max, undefined, false, {trigger: 'syncExtremes'});
                     }
                 }
-            }
-    );
-});
-
-/**
- * Override the reset function, we don't need to hide the tooltips and
- * crosshairs.
- */
-Highcharts.Pointer.prototype.reset = function () {
-    return undefined;
-};
-
-/**
- * Highlight a point by showing tooltip, setting hover state and draw crosshair
- */
-Highcharts.Point.prototype.highlight = function (event) {
-    event = this.series.chart.pointer.normalize(event);
-    this.onMouseOver(); // Show the hover marker
-    this.series.chart.tooltip.refresh(this); // Show the tooltip
-    this.series.chart.xAxis[0].drawCrosshair(event, this); // Show the crosshair
-};
-
-/**
- * Synchronize zooming through the setExtremes event handler.
- */
-function syncExtremes(e) {
-    var thisChart = this.chart;
-
-    if (e.trigger !== 'syncExtremes') { // Prevent feedback loop
-        Highcharts.each(Highcharts.charts, function (chart) {
-            if (chart !== thisChart) {
-                if (chart.xAxis[0].setExtremes) { // It is null while updating
-                    chart.xAxis[0].setExtremes(
-                            e.min,
-                            e.max,
-                            undefined,
-                            false,
-                            {trigger: 'syncExtremes'}
-                    );
-                }
-            }
-        });
+            });
+        }
     }
-}
 
 // Get the data. The contents of the data file can be viewed at
-Highcharts.ajax({
-    url: 'https://cdn.jsdelivr.net/gh/highcharts/highcharts@v7.0.0/samples/data/activity.json',
-    dataType: 'text',
-    success: function (activity) {
 
-        activity = JSON.parse(activity);
-        var i = 0;
-        for (var i = 0; i < 2; i++) {
+// Get the data. The contents of the data file can be viewed at
+    var i = 0;
+    for (var i = 0; i < 2; i++) {
 
-            console.log(i);
-            // Add X values
+        console.log(i);
+        // Add X values
 //            dataset.data = Highcharts.map(dataset.data, function (val, j) {
 //                return [activity.xData[j], val];
 //            });
-            //document.getElementById("whereToPrint").innerHTML = JSON.stringify(dataset.data, null, 4);
+        //document.getElementById("whereToPrint").innerHTML = JSON.stringify(dataset.data, null, 4);
 
-            var chartDiv = document.createElement('div');
-            chartDiv.className = 'chart';
-            document.getElementById('container').appendChild(chartDiv);
+        var chartDiv = document.createElement('div');
+        chartDiv.className = 'chart';
+        document.getElementById('container').appendChild(chartDiv);
+        if (i === 0) {
+            Highcharts.chart(chartDiv, {
 
-            if (i == 1) {
-                Highcharts.chart(chartDiv, {
-                    chart: {
-                        renderTo: 'container2',
-                        type: 'xrange',
-                        zoomType: 'x'
-
+                chart: {
+                    renderTo: 'container2',
+                    zoomType: 'x'
+                },
+                title: {
+                    text: 'Run ' + <?php echo $enregistrement->id ?>
+                },
+                subtitle: {
+                    text: document.ontouchstart === undefined ?
+                            'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
+                },
+                xAxis: {
+                    type: 'datetime',
+                    labels: {
+                        enabled: false
                     },
+                    crosshair: true,
+                    events: {
+                        setExtremes: syncExtremes
+                    }
+                },
+                yAxis: {
                     title: {
                         text: ''
                     },
-                    xAxis: {
-                        type: 'datetime',
-                        tickInterval: 1000 * 60 * 15
-                    },
-                    yAxis: {
-                        
-                        gridLineWidth: 0,
-                        minorGridLineWidth: 0,
-                        labels: {
+                    gridLineWidth: 0,
+                    minorGridLineWidth: 0
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'middle',
+                    x:-45
+                    
+                },
+                plotOptions: {
+                    series: {enabled: false,
+                        marker: {
                             enabled: false
-                        },
-                        categories: [''],
-                        reversed: true
-                    },
-                    plotOptions: {
-                        series: {
-                            colorByPoint: true,
-                            allowPointSelect: true,
-                        }
-                    },
-                    legend: {
-                        symbolHeight: 11,
-                        symbolWidth: 10,
-                        symbolRadius: 12,
-                        layout: 'vertical',
-                        align: 'right',
-                        verticalAlign: 'middle'
-                    }, tooltip: {
-                        crosshairs: [true]
-                    },
-                    series: [{
-<?php echo $sequenceSeries; ?>
-                        }]
-                });
-            } else {
-                Highcharts.chart(chartDiv, {
-
-                    chart: {
-                        renderTo: 'container2',
-                        zoomType: 'x'
-                    },
-                    title: {
-                        text: 'Run ' + <?php echo $enregistrement->id ?>
-                    },
-                    subtitle: {
-                        text: document.ontouchstart === undefined ?
-                                'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
-                    },
-                    xAxis: {
-                        type: 'datetime',
-                        labels: {
-                            enabled: false
-                        }
-                    },
-                    yAxis: {
-                        title: {
-                            text: ''
-                        },
-                        gridLineWidth: 0,
-                        minorGridLineWidth: 0,
-                    },
-                    legend: {
-                        layout: 'vertical',
-                        align: 'right',
-                        verticalAlign: 'middle'
-                    },
-                    plotOptions: {
-                        series: {enabled: false,
-                            marker: {
-                                enabled: false
-                            }
-                        }
-                    }, tooltip: {
-                        crosshairs: [true],
-                        shared: true
-                    },
-                    series: [{
-<?php echo $analogiqueSeries; ?>
-                        }],
-                    exporting: {
-                        enabled: true,
-                        sourceWidth: 2000,
-                        sourceHeight: 200,
-                        // scale: 2 (default)
-                        chartOptions: {
-                            subtitle: null
                         }
                     }
+                },tooltip: {
+                    
+                        shared: true,
+                        
+                        
+                        
+                        
+                    },
+                series: [{
+<?php echo $analogiqueSeries; ?>
+                    }]
 
 
-                });
+            });
+        }
+        if (i === 1) {
+            Highcharts.chart(chartDiv, {
+                chart: {
+                    renderTo: 'container2',
+                    type: 'xrange',
+                    zoomType: 'x'
 
+                },
+                title: {
+                    text: ''
+                },
+                xAxis: {
+                    type: 'datetime',
+                    tickInterval: 1000 * 60 * 15,
+                    crosshair: true,
+                    events: {
+                        setExtremes: syncExtremes
+                    }
+                },
+                yAxis: {
 
-            }
+                    gridLineWidth: 0,
+                    minorGridLineWidth: 0,
+                    labels: {
+                        enabled: false
+                    },
+                    categories: [''],
+                    reversed: true
+                },
+                plotOptions: {
+                    series: {
+                        colorByPoint: true,
+                        allowPointSelect: true,
+                    }
+                },
+                legend: {
+                    symbolHeight: 11,
+                    symbolWidth: 15,
+                    symbolRadius: 12,
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'middle'
+                }, tooltip: {
+                    
+                },
+                series: [{
+<?php echo $sequenceSeries; ?>
+                    }]
+            });
         }
     }
+
+
+
 });
+
+
 
 
 
