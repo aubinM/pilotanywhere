@@ -1,13 +1,13 @@
 @include('includes.head')
 <script src="/js/highcharts/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/boost.js"></script>
-<script src="http://code.highcharts.com/modules/exporting.js"></script>
-<script src="https://code.highcharts.com/modules/xrange.js"></script>
+<script src="/js/highcharts/modules/boost.js"></script>
+<script src="/js/highcharts/modules/exporting.js"></script>
+<script src="/js/highcharts/modules/xrange.js"></script>
 <!-- optional -->
-<script src="http://code.highcharts.com/modules/offline-exporting.js"></script>
-<script src="http://code.highcharts.com/modules/export-data.js"></script>
-<script src="https://code.highcharts.com/modules/data.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script src="/js/highcharts/modules/offline-exporting.js"></script>
+<script src="/js/highcharts/modules/export-data.js"></script>
+<script src="/js/highcharts/modules/data.js"></script>
+<script src="/js/jquery-3.4.0.min.js"></script>
 
 <body id="page-top">
 
@@ -152,85 +152,164 @@
                     $analogiqueSeries = rtrim($analogiqueSeries, '},{');
                     //echo $sequenceSeries;
                     ?>
+                    <nav aria-label="Page navigation example">
 
-                    <div id="container" style="width:100%; height:400px;"></div>
+
+                        <ul class="pagination d-flex justify-content-between">
+
+
+                            @if($enregistrement->id-1 < 1)
+                            <a href="{{$enregistrement->id-1 > 0 ? route('graphes.show', $enregistrement->id-1) : ""}}" class="btn btn-outline-primary disabled btn-sm" role="button" >Précédent</a>
+                                @else 
+                            <a href="{{$enregistrement->id-1 > 0 ? route('graphes.show', $enregistrement->id-1) : ""}}" class="btn btn-outline-primary  btn-sm" role="button">Précédent</a>
+                                @endif
+                                    
+
+                             
+                            </li>
+                            
+                            <li><button id="export-pdf" class="btn btn-primary"><i class="fas fa-print"></i></button></li>
+
+
+                            @if($enregistrement->id+1 > $enregistrement_last_id)
+                            <a href="{{$enregistrement->id+1 > 0 ? route('graphes.show', $enregistrement->id+1) : ""}}" class="btn btn-outline-primary disabled btn-sm" role="button" >Suivant</a>
+                                @else 
+                            <a href="{{$enregistrement->id+1 > 0 ? route('graphes.show', $enregistrement->id+1) : ""}}" class="btn btn-outline-primary  btn-sm"  >Suivant</a>
+                                @endif
+                                
+                            </li>
+                        </ul>
+
+
+                    </nav>
+
+                    <div id="container"></div>
 
 
                     <script>
 
 
 
-Highcharts.setOptions({
-    lang: {
-        months: [
-            'Janvier', 'Février', 'Mars', 'Avril',
-            'Mai', 'Juin', 'Juillet', 'Août',
-            'Septembre', 'Octobre', 'Novembre', 'Décembre'
-        ],
-        weekdays: [
-            'Dimanche', 'Lundi', 'Mardi', 'Mercredi',
-            'Jeudi', 'Vendredi', 'Samedi'
-        ],
-        shortMonths: ["Jan", "Fev", "Mar", "Avr", "Mai", "Juin", "Juil", "Aout", "Sep", "Oct", "Nov", "Dec"]
-    }
-});
-
-(function (H) {
-    H.Legend.prototype.getAllItems = function () {
-        var allItems = [];
-        H.each(this.chart.series, function (series) {
-            var seriesOptions = series && series.options;
-            if (series.type === 'xrange') {
-                series.color = series.userOptions.color
-            }
-// Handle showInLegend. If the series is linked to another series,
-// defaults to false.
-            if (series && H.pick(
-                    seriesOptions.showInLegend,
-                    !H.defined(seriesOptions.linkedTo) ? undefined : false, true
-                    )) {
-
-// Use points or series for the legend item depending on
-// legendType
-                allItems = allItems.concat(
-                        series.legendItems ||
-                        (
-                                seriesOptions.legendType === 'point' ?
-                                series.data :
-                                series
-                                )
-                        );
-            }
-        });
-        H.fireEvent(this, 'afterGetAllItems', {allItems: allItems});
-        return allItems;
-    }
-})(Highcharts)
-
-Highcharts.seriesTypes.column.prototype.drawLegendSymbol =
-        Highcharts.seriesTypes.line.prototype.drawLegendSymbol;
-
-
 
 
 
 $(function () {
-    $('#container').bind('mouseleave mouseout ', function (e) {
-        var chart,
-                point,
-                i,
-                event;
 
-        for (i = 0; i < Highcharts.charts.length; i = i + 1) {
-            chart = Highcharts.charts[i];
-            event = chart.pointer.normalize(e.originalEvent);
-            point = chart.series[0].searchPoint(event, true);
+    /**
+     * Create a global getSVG method that takes an array of charts as an
+     * argument
+     */
+    Highcharts.getSVG = function (charts) {
+        var svgArr = [],
+                top = 0,
+                width = 0;
 
-            point.onMouseOut();
-            chart.tooltip.hide(point);
-            chart.xAxis[0].hideCrosshair();
+        $.each(charts, function (i, chart) {
+            var svg = chart.getSVG();
+
+            svg = svg.replace('<svg', '<g transform="translate(0,' + top + ')" ');
+            svg = svg.replace('</svg>', '</g>');
+            svg = svg.replace('-9000000000', '-999'); // Bug in v4.2.6
+
+            top += chart.chartHeight;
+            width = Math.max(width, chart.chartWidth);
+
+            svgArr.push(svg);
+        });
+
+        return '<svg height="' + top + '" width="' + width + '" version="1.1" xmlns="http://www.w3.org/2000/svg">' + svgArr.join('') + '</svg>';
+    };
+
+    /**
+     * Create a global exportCharts method that takes an array of charts as an
+     * argument, and exporting options as the second argument
+     */
+    Highcharts.exportCharts = function (charts, options) {
+
+        // Merge the options
+        options = Highcharts.merge(Highcharts.getOptions().exporting, options);
+
+        // Post to export server
+        Highcharts.post(options.url, {
+            filename: options.filename || 'chart',
+            type: options.type,
+            width: options.width,
+            svg: Highcharts.getSVG(charts)
+        });
+    };
+
+
+
+
+    Highcharts.setOptions({
+        lang: {
+            months: [
+                'Janvier', 'Février', 'Mars', 'Avril',
+                'Mai', 'Juin', 'Juillet', 'Août',
+                'Septembre', 'Octobre', 'Novembre', 'Décembre'
+            ],
+            weekdays: [
+                'Dimanche', 'Lundi', 'Mardi', 'Mercredi',
+                'Jeudi', 'Vendredi', 'Samedi'
+            ],
+            shortMonths: ["Jan", "Fev", "Mar", "Avr", "Mai", "Juin", "Juil", "Aout", "Sep", "Oct", "Nov", "Dec"]
         }
     });
+//Color legend graph sequence
+    (function (H) {
+        H.Legend.prototype.getAllItems = function () {
+            var allItems = [];
+            H.each(this.chart.series, function (series) {
+                var seriesOptions = series && series.options;
+                if (typeof series !== 'undefined') {
+                    if (series.type === 'xrange') {
+                        series.color = series.userOptions.color
+                    }
+// Handle showInLegend. If the series is linked to another series,
+// defaults to false.
+                    if (series && H.pick(
+                            seriesOptions.showInLegend,
+                            !H.defined(seriesOptions.linkedTo) ? undefined : false, true
+                            )) {
+
+// Use points or series for the legend item depending on
+// legendType
+                        allItems = allItems.concat(
+                                series.legendItems ||
+                                (
+                                        seriesOptions.legendType === 'point' ?
+                                        series.data :
+                                        series
+                                        )
+                                );
+                    }
+                }
+            });
+            H.fireEvent(this, 'afterGetAllItems', {allItems: allItems});
+            return allItems;
+        }
+    })(Highcharts)
+
+    Highcharts.seriesTypes.column.prototype.drawLegendSymbol =
+            Highcharts.seriesTypes.line.prototype.drawLegendSymbol;
+
+//
+//    $('#container').bind('mouseleave mouseout ', function (e) {
+//        var chart,
+//                point,
+//                i,
+//                event;
+//
+//        for (i = 0; i < Highcharts.charts.length; i = i + 1) {
+//            chart = Highcharts.charts[i];
+//            event = chart.pointer.normalize(e.originalEvent);
+//            point = chart.series[0].searchPoint(event, true);
+//
+//            point.onMouseOut();
+//            chart.tooltip.hide(point);
+//            chart.xAxis[0].hideCrosshair();
+//        }
+//    });
 
     var container_title = "Root Zone Soil Moisture Depletion:";
     var xrange_title = "Growth Stages";
@@ -275,34 +354,33 @@ $(function () {
                 id: "myPlotLineId"
             });
 
-         
+
 
 
             //if you have other charts that need to be syncronized - update their crosshair (plot line) in the same way in this function.                   
         });
     }
-    
-         function syncExtremes(e) {
+
+    function syncExtremes(e) {
         var thisChart = this.chart;
 
         if (e.trigger !== 'syncExtremes') { // Prevent feedback loop
             Highcharts.each(Highcharts.charts, function (chart) {
                 if (chart !== thisChart) {
                     if (chart.xAxis[0].setExtremes) { // It is null while updating
-                        chart.xAxis[0].setExtremes(e.min, e.max, undefined, false, { trigger: 'syncExtremes' });
+                        chart.xAxis[0].setExtremes(e.min, e.max, undefined, false, {trigger: 'syncExtremes'});
                     }
                 }
             });
         }
     }
 
-// Get the data. The contents of the data file can be viewed at
+
 
 // Get the data. The contents of the data file can be viewed at
     var i = 0;
     for (var i = 0; i < 2; i++) {
 
-        console.log(i);
         // Add X values
 //            dataset.data = Highcharts.map(dataset.data, function (val, j) {
 //                return [activity.xData[j], val];
@@ -319,7 +397,8 @@ $(function () {
                     type: 'line',
                     zoomType: 'x',
                     panning: true,
-                    panKey: 'shift'
+                    panKey: 'shift',
+
                 },
                 title: {
                     text: 'Run ' + <?php echo $enregistrement->id ?>
@@ -330,14 +409,14 @@ $(function () {
                 },
                 xAxis: {
                     type: 'datetime',
-             
-                    maxZoom: 1000 * 60 ,
+
+                    maxZoom: 1000 * 60,
                     labels: {
-                        
+
                     },
                     crosshair: true,
                     events: {
-                     setExtremes: syncExtremes
+                        setExtremes: syncExtremes
                     }
                 },
                 yAxis: {
@@ -351,7 +430,7 @@ $(function () {
                     layout: 'vertical',
                     align: 'right',
                     verticalAlign: 'middle',
-                    x: -45
+                    itemWidth: 160,
 
                 },
                 plotOptions: {
@@ -362,12 +441,24 @@ $(function () {
                     }
                 }, tooltip: {
 
-                    shared: true,
+                    shared: true
 
                 },
                 series: [{
 <?php echo $analogiqueSeries; ?>
-                    }]
+                    }],
+                exporting: {
+                    sourceWidth: 1250,
+                    sourceHeight: 500,
+                    // scale: 2 (default)
+                    chartOptions: {
+                        subtitle: null
+                    },
+                    enabled: false
+                },
+                credits: {
+                    enabled: false
+                }
 
 
             }, function (chart) {
@@ -378,7 +469,9 @@ $(function () {
             chart2 = Highcharts.chart(chartDiv, {
                 chart: {
                     type: 'xrange',
-                    zoomType: 'x'
+                    zoomType: 'x',
+                    panning: true,
+                    panKey: 'shift',
 
                 },
                 title: {
@@ -386,8 +479,8 @@ $(function () {
                 },
                 xAxis: {
                     type: 'datetime',
-                    minTickInterval: 1000 ,
-                    maxZoom: 1000 * 60 ,
+                    minTickInterval: 1000,
+                    maxZoom: 1000 * 60,
                     crosshair: {
                         snap: false,
                         zIndex: 100
@@ -418,7 +511,8 @@ $(function () {
                     symbolRadius: 12,
                     layout: 'vertical',
                     align: 'right',
-                    verticalAlign: 'middle'
+                    verticalAlign: 'middle',
+                    itemWidth: 160,
                 }, tooltip: {
                     crosshairs: [true, false],
                     followPointer: true,
@@ -431,23 +525,39 @@ $(function () {
                 },
                 series: [{
 <?php echo $sequenceSeries; ?>
-                    }]
+                    }],
+                exporting: {
+                    sourceWidth: 1250,
+                    sourceHeight: 500,
+                    // scale: 2 (default)
+                    chartOptions: {
+                        subtitle: null
+                    },
+                    enabled: false
+                },
+                credits: {
+                    enabled: false
+                },
             }, function (chart) {
                 syncronizeCrossHairs(chart);
             });
         }
     }
+    chart1.reflow();
+    chart2.reflow();
+
+
+
+    $('#export-pdf').click(function () {
+        Highcharts.exportCharts([chart1, chart2], {
+            type: 'application/pdf'
+        });
+    });
+
 
 
 
 });
-
-
-
-
-
-
-
 
 
 

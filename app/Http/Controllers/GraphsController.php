@@ -22,7 +22,7 @@ class GraphsController extends Controller
         $materiels = Ca_enregistrement::all()->last()->materiel_autonome->Ca_enregistrement_graphe_config;
         
 
-        return view('layouts.graphes',compact('enregistrement','materiels'));
+        return view('layouts.graphes',compact('enregistrement','materiels','enregistrement_last_id'));
     }
 
     /**
