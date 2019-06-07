@@ -691,3 +691,35 @@ $(function () {
 
 
 
+<!--Highcharts.chart('container', {
+chart: {
+zoomType: 'x'
+
+},
+    xAxis: {
+    maxZoom: 1000 * 60,
+        plotLines: [{
+            color: 'red',
+            width: 3,
+            value: Date.UTC(2010, 0, 4,0,1,0),
+            zIndex: 3
+        },{
+        color: 'red',
+            width: 3,
+            value: Date.UTC(2010, 0, 4,0,1,0,5),
+            zIndex: 3
+        }],
+        tickInterval: 3600, // one day
+        type: 'datetime'
+    },
+
+    series: [{
+        data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4],
+        pointStart: Date.UTC(2010, 0, 1),
+        pointInterval: 24 * 3600 * 1000
+    },{
+    data: [29.9,50,50,50,50,50,50,50,50,50],
+        pointStart: Date.UTC(2010, 0, 1),
+        pointInterval: 24 * 3600 * 1000
+    }]
+});-->
