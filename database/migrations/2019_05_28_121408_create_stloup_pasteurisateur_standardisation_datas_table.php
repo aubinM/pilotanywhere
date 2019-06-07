@@ -55,6 +55,9 @@ class CreateStloupPasteurisateurStandardisationDatasTable extends Migration
             $table->boolean('vanne_alim_eau_polishee_cuve_soude');
             $table->boolean('vanne_alim_eau_polishee_cuve_acide');
             $table->boolean('securisation');
+            
+            $table->string('alarmes');
+            
                
             $table->timestamps();
             $table->index('ca_enregistrement_id','ca_enregistrement_id');

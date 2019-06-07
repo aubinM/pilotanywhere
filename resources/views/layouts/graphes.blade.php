@@ -54,6 +54,7 @@
                     foreach ($materiels as $config) {
                         $code = $config->code;
 
+
                         if ($config->type == 2) {
                             $color = random_color();
                             $sequenceSeries .= "name: '" . $config->name . "',";
@@ -148,9 +149,93 @@
                             $analogiqueSeries .= "]},{";
                         }
                     }
-                    $sequenceSeries = rtrim($sequenceSeries, ',}, { ');
-                    $analogiqueSeries = rtrim($analogiqueSeries, '},{');
-                    //echo $sequenceSeries;
+                    $sequenceSeries2 = rtrim($sequenceSeries, ',}, { ');
+                    $analogiqueSeries2 = rtrim($analogiqueSeries, '},{');
+                    
+                    $legendMarginTop = null;
+                    $legendY = 0;
+
+                    switch ($y) {
+                        case 1:
+                            $legendMarginTop = 125;
+                            $legendY=15;
+                            break;
+                        case 2:
+                            $legendMarginTop = 65;
+                            $legendY=15;
+                            break;
+                        case 3:
+                            $legendMarginTop = 53;
+                            $legendY=5;
+                            break;
+                        case 4:
+                            $legendMarginTop = 42;
+                            $legendY=5;
+                            break;
+                        case 5:
+                            $legendMarginTop = 34;
+                            $legendY=2;
+                            break;
+                        case 6:
+                            $legendMarginTop = 22;
+                            $legendY=1;
+                            break;
+                        case 7:
+                            $legendMarginTop = 22;
+                            break;
+                        case 8:
+                            $legendMarginTop = 19;
+                            break;
+                        case 9:
+                            $legendMarginTop = 15;
+                            break;
+                        case 10:
+                            $legendMarginTop = 12.5;
+                            break;
+                        case 11:
+                            $legendMarginTop = 10;
+                            break;
+                        case 12:
+                            $legendMarginTop = 8;
+                            break;
+                        case 13:
+                            $legendMarginTop = 6;
+                            break;
+                        case 14:
+                            $legendMarginTop = 4.5;
+                            break;
+                        case 15:
+                            $legendMarginTop = 3.5;
+                            break;
+                        case 16:
+                            $legendMarginTop = 2;
+                            break;
+                        case 17:
+                            $legendMarginTop = 1;
+                            break;
+                        case 18:
+                            $legendMarginTop = 0;
+                            break;
+                        case 19:
+                            $legendMarginTop = -0.8;
+                            break;
+                        case 20:
+                            $legendMarginTop = -1.5;
+                            break;
+                        case 21:
+                            $legendMarginTop = -2.4;
+                            break;
+                        case 22:
+                            $legendMarginTop = -2.9;
+                            break;
+                        case 23:
+                            $legendMarginTop = -3.6;
+                            break;
+                        case 24:
+                            $legendMarginTop = -4.2;
+                            break;
+                        
+                    }
                     ?>
                     <nav aria-label="Page navigation example">
 
@@ -159,24 +244,24 @@
 
 
                             @if($enregistrement->id-1 < 1)
-                            <a href="{{$enregistrement->id-1 > 0 ? route('graphes.show', $enregistrement->id-1) : ""}}" class="btn btn-outline-primary disabled btn-sm" role="button" >Précédent</a>
-                                @else 
-                            <a href="{{$enregistrement->id-1 > 0 ? route('graphes.show', $enregistrement->id-1) : ""}}" class="btn btn-outline-primary  btn-sm" role="button">Précédent</a>
-                                @endif
-                                    
+                            <a href="{{$enregistrement->id-1 > 0 ? route('graphes.show', $enregistrement->id-1) : ""}}" class="btn btn-primary disabled btn-sm" role="button" >Précédent</a>
+                            @else 
+                            <a href="{{$enregistrement->id-1 > 0 ? route('graphes.show', $enregistrement->id-1) : ""}}" class="btn btn-primary  btn-sm" role="button">Précédent</a>
+                            @endif
 
-                             
+
+
                             </li>
-                            
+
                             <li><button id="export-pdf" class="btn btn-primary"><i class="fas fa-print"></i></button></li>
 
 
                             @if($enregistrement->id+1 > $enregistrement_last_id)
-                            <a href="{{$enregistrement->id+1 > 0 ? route('graphes.show', $enregistrement->id+1) : ""}}" class="btn btn-outline-primary disabled btn-sm" role="button" >Suivant</a>
-                                @else 
-                            <a href="{{$enregistrement->id+1 > 0 ? route('graphes.show', $enregistrement->id+1) : ""}}" class="btn btn-outline-primary  btn-sm"  >Suivant</a>
-                                @endif
-                                
+                            <a href="{{$enregistrement->id+1 > 0 ? route('graphes.show', $enregistrement->id+1) : ""}}" class="btn btn-primary disabled btn-sm" role="button" >Suivant</a>
+                            @else 
+                            <a href="{{$enregistrement->id+1 > 0 ? route('graphes.show', $enregistrement->id+1) : ""}}" class="btn btn-primary  btn-sm"  >Suivant</a>
+                            @endif
+
                             </li>
                         </ul>
 
@@ -409,6 +494,7 @@ $(function () {
                 },
                 xAxis: {
                     type: 'datetime',
+                    visible: false,
 
                     maxZoom: 1000 * 60,
                     labels: {
@@ -445,7 +531,7 @@ $(function () {
 
                 },
                 series: [{
-<?php echo $analogiqueSeries; ?>
+<?php echo $analogiqueSeries2; ?>
                     }],
                 exporting: {
                     sourceWidth: 1250,
@@ -513,6 +599,13 @@ $(function () {
                     align: 'right',
                     verticalAlign: 'middle',
                     itemWidth: 160,
+                    y: <?php echo $legendY;?>,
+                    itemMarginTop: <?php echo $legendMarginTop;?>,
+                    itemStyle: {
+                        color: '#000000',
+                        fontWeight: 'bold',
+                        fontSize: '12px'
+                    }
                 }, tooltip: {
                     crosshairs: [true, false],
                     followPointer: true,
@@ -524,7 +617,7 @@ $(function () {
 
                 },
                 series: [{
-<?php echo $sequenceSeries; ?>
+<?php echo $sequenceSeries2; ?>
                     }],
                 exporting: {
                     sourceWidth: 1250,
@@ -543,8 +636,8 @@ $(function () {
             });
         }
     }
-    chart1.reflow();
-    chart2.reflow();
+//    chart1.reflow();
+//    chart2.reflow();
 
 
 

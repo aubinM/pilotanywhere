@@ -12,7 +12,7 @@ $factory->define(Stloup_pasteurisateur_standardisation_data::class, function (Fa
     
     
     return [
-        'ca_enregistrement_id' => 2,
+        'ca_enregistrement_id' => 1,
         'Debit_Envoi' => $faker->randomFloat(2, 30, 32),
         'Debit_Retour' => $faker->randomFloat(2, 40, 42),
         'Temp_Retour' => $faker->randomFloat(2, 25, 35),
