@@ -36,12 +36,20 @@
                     $y = 0;
                     $analogiqueSeries = null;
                     $sequenceSeries = null;
+                    $plotbands = null;
                     $annee = null;
                     $mois = null;
                     $jour = null;
                     $heure = null;
                     $minute = null;
                     $seconde = null;
+                    $dates_alarmes = array();
+                    foreach ($all_alarmes as $alarme) {
+                        $dates_alarmes[$alarme->id . "debut"] = null;
+                        $dates_alarmes[$alarme->id . "fin"] = null;
+                    }
+
+                    //var_dump($dates_alarmes);
 
                     function random_color_part() {
                         return str_pad(dechex(mt_rand(0, 255)), 2, '0', STR_PAD_LEFT);
@@ -49,6 +57,40 @@
 
                     function random_color() {
                         return random_color_part() . random_color_part() . random_color_part();
+                    }
+
+                    foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
+                        $date = new DateTime($datas->_date);
+                        $annee = $date->format('Y');
+                        $mois = $date->format('m') - 1;
+
+                        $jour = $date->format('d');
+                        $heure = $date->format('H');
+
+                        $minute = $date->format('i');
+                        $seconde = $date->format('s');
+
+                        $alarmes = explode(",", $datas->alarmes);
+
+                        foreach ($all_alarmes as $all_alarme) {
+                            if (in_array($all_alarme->id, $alarmes) && is_null($dates_alarmes[$all_alarme->id . "debut"])) {
+
+                                $dates_alarmes[$all_alarme->id . "debut"] = "Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")";
+                                echo"La date debut de l'alarme " . $all_alarme->id . "est  : " . $dates_alarmes[$all_alarme->id . "debut"];
+                            }
+
+                            if (!in_array($all_alarme->id, $alarmes) && !is_null($dates_alarmes[$all_alarme->id . "debut"])) {
+                                $dates_alarmes[$all_alarme->id . "fin"] = "Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")";
+                                if ($all_alarme->critical_level == 1) {
+                                    $color = "#FF7F50";
+                                } else {
+                                    $color = "#ff4040";
+                                }
+                                echo"La date fin de l'alarme " . $all_alarme->id . "est  : " . $dates_alarmes[$all_alarme->id . "fin"];
+                                $plotbands .= "{color: '" . $color . "',from: " . $dates_alarmes[$all_alarme->id . "debut"] . ",to: " . $dates_alarmes[$all_alarme->id . "fin"] . ",},";
+                                $dates_alarmes[$all_alarme->id . "debut"] = null;
+                            }
+                        }
                     }
 
                     foreach ($materiels as $config) {
@@ -151,34 +193,34 @@
                     }
                     $sequenceSeries2 = rtrim($sequenceSeries, ',}, { ');
                     $analogiqueSeries2 = rtrim($analogiqueSeries, '},{');
-                    
+
                     $legendMarginTop = null;
                     $legendY = 0;
 
                     switch ($y) {
                         case 1:
                             $legendMarginTop = 125;
-                            $legendY=15;
+                            $legendY = 15;
                             break;
                         case 2:
                             $legendMarginTop = 65;
-                            $legendY=15;
+                            $legendY = 15;
                             break;
                         case 3:
                             $legendMarginTop = 53;
-                            $legendY=5;
+                            $legendY = 5;
                             break;
                         case 4:
                             $legendMarginTop = 42;
-                            $legendY=5;
+                            $legendY = 5;
                             break;
                         case 5:
                             $legendMarginTop = 34;
-                            $legendY=2;
+                            $legendY = 2;
                             break;
                         case 6:
                             $legendMarginTop = 22;
-                            $legendY=1;
+                            $legendY = 1;
                             break;
                         case 7:
                             $legendMarginTop = 22;
@@ -234,7 +276,6 @@
                         case 24:
                             $legendMarginTop = -4.2;
                             break;
-                        
                     }
                     ?>
                     <nav aria-label="Page navigation example">
@@ -280,104 +321,93 @@
 
 $(function () {
 
-    /**
-     * Create a global getSVG method that takes an array of charts as an
-     * argument
-     */
-    Highcharts.getSVG = function (charts) {
-        var svgArr = [],
-                top = 0,
-                width = 0;
+/**
+ * Create a global getSVG method that takes an array of charts as an
+ * argument
+ */
+Highcharts.getSVG = function (charts) {
+var svgArr = [],
+        top = 0,
+        width = 0;
+$.each(charts, function (i, chart) {
+var svg = chart.getSVG();
+svg = svg.replace('<svg', '<g transform="translate(0,' + top + ')" ');
+svg = svg.replace('</svg>', '</g>');
+svg = svg.replace('-9000000000', '-999'); // Bug in v4.2.6
 
-        $.each(charts, function (i, chart) {
-            var svg = chart.getSVG();
+top += chart.chartHeight;
+width = Math.max(width, chart.chartWidth);
+svgArr.push(svg);
+});
+return '<svg height="' + top + '" width="' + width + '" version="1.1" xmlns="http://www.w3.org/2000/svg">' + svgArr.join('') + '</svg>';
+};
+/**
+ * Create a global exportCharts method that takes an array of charts as an
+ * argument, and exporting options as the second argument
+ */
+Highcharts.exportCharts = function (charts, options) {
 
-            svg = svg.replace('<svg', '<g transform="translate(0,' + top + ')" ');
-            svg = svg.replace('</svg>', '</g>');
-            svg = svg.replace('-9000000000', '-999'); // Bug in v4.2.6
-
-            top += chart.chartHeight;
-            width = Math.max(width, chart.chartWidth);
-
-            svgArr.push(svg);
-        });
-
-        return '<svg height="' + top + '" width="' + width + '" version="1.1" xmlns="http://www.w3.org/2000/svg">' + svgArr.join('') + '</svg>';
-    };
-
-    /**
-     * Create a global exportCharts method that takes an array of charts as an
-     * argument, and exporting options as the second argument
-     */
-    Highcharts.exportCharts = function (charts, options) {
-
-        // Merge the options
-        options = Highcharts.merge(Highcharts.getOptions().exporting, options);
-
-        // Post to export server
-        Highcharts.post(options.url, {
-            filename: options.filename || 'chart',
-            type: options.type,
-            width: options.width,
-            svg: Highcharts.getSVG(charts)
-        });
-    };
-
-
-
-
-    Highcharts.setOptions({
-        lang: {
-            months: [
-                'Janvier', 'Février', 'Mars', 'Avril',
-                'Mai', 'Juin', 'Juillet', 'Août',
-                'Septembre', 'Octobre', 'Novembre', 'Décembre'
-            ],
-            weekdays: [
+// Merge the options
+options = Highcharts.merge(Highcharts.getOptions().exporting, options);
+// Post to export server
+Highcharts.post(options.url, {
+filename: options.filename || 'chart',
+        type: options.type,
+        width: options.width,
+        svg: Highcharts.getSVG(charts)
+});
+};
+Highcharts.setOptions({
+lang: {
+months: [
+        'Janvier', 'Février', 'Mars', 'Avril',
+        'Mai', 'Juin', 'Juillet', 'Août',
+        'Septembre', 'Octobre', 'Novembre', 'Décembre'
+],
+        weekdays: [
                 'Dimanche', 'Lundi', 'Mardi', 'Mercredi',
                 'Jeudi', 'Vendredi', 'Samedi'
-            ],
-            shortMonths: ["Jan", "Fev", "Mar", "Avr", "Mai", "Juin", "Juil", "Aout", "Sep", "Oct", "Nov", "Dec"]
-        }
-    });
+        ],
+        shortMonths: ["Jan", "Fev", "Mar", "Avr", "Mai", "Juin", "Juil", "Aout", "Sep", "Oct", "Nov", "Dec"]
+}
+});
 //Color legend graph sequence
-    (function (H) {
-        H.Legend.prototype.getAllItems = function () {
-            var allItems = [];
-            H.each(this.chart.series, function (series) {
-                var seriesOptions = series && series.options;
-                if (typeof series !== 'undefined') {
-                    if (series.type === 'xrange') {
-                        series.color = series.userOptions.color
-                    }
+(function (H) {
+H.Legend.prototype.getAllItems = function () {
+var allItems = [];
+H.each(this.chart.series, function (series) {
+var seriesOptions = series && series.options;
+if (typeof series !== 'undefined') {
+if (series.type === 'xrange') {
+series.color = series.userOptions.color
+}
 // Handle showInLegend. If the series is linked to another series,
 // defaults to false.
-                    if (series && H.pick(
-                            seriesOptions.showInLegend,
-                            !H.defined(seriesOptions.linkedTo) ? undefined : false, true
-                            )) {
+if (series && H.pick(
+        seriesOptions.showInLegend,
+        !H.defined(seriesOptions.linkedTo) ? undefined : false, true
+        )) {
 
 // Use points or series for the legend item depending on
 // legendType
-                        allItems = allItems.concat(
-                                series.legendItems ||
-                                (
-                                        seriesOptions.legendType === 'point' ?
-                                        series.data :
-                                        series
-                                        )
-                                );
-                    }
-                }
-            });
-            H.fireEvent(this, 'afterGetAllItems', {allItems: allItems});
-            return allItems;
-        }
-    })(Highcharts)
+allItems = allItems.concat(
+        series.legendItems ||
+        (
+                seriesOptions.legendType === 'point' ?
+                series.data :
+                series
+                )
+        );
+}
+}
+});
+H.fireEvent(this, 'afterGetAllItems', {allItems: allItems});
+return allItems;
+}
+})(Highcharts)
 
-    Highcharts.seriesTypes.column.prototype.drawLegendSymbol =
-            Highcharts.seriesTypes.line.prototype.drawLegendSymbol;
-
+        Highcharts.seriesTypes.column.prototype.drawLegendSymbol =
+        Highcharts.seriesTypes.line.prototype.drawLegendSymbol;
 //
 //    $('#container').bind('mouseleave mouseout ', function (e) {
 //        var chart,
@@ -396,260 +426,241 @@ $(function () {
 //        }
 //    });
 
-    var container_title = "Root Zone Soil Moisture Depletion:";
-    var xrange_title = "Growth Stages";
-
-    var chart1;
-    var chart2;
-    var chart3;
-
-    var hasPlotBand = false;
-
-
+var container_title = "Root Zone Soil Moisture Depletion:";
+var xrange_title = "Growth Stages";
+var chart1;
+var chart2;
+var chart3;
+var hasPlotBand = false;
 //catch mousemove event and have all 3 charts' crosshairs move along indicated values on x axis
 
-    function syncronizeCrossHairs(chart) {
-        var container = $(chart.container),
-                offset = container.offset(),
-                x, y, isInside, report;
+function syncronizeCrossHairs(chart) {
+var container = $(chart.container),
+        offset = container.offset(),
+        x, y, isInside, report;
+container.mousemove(function (evt) {
 
-        container.mousemove(function (evt) {
+x = evt.clientX - chart.plotLeft - offset.left;
+y = evt.clientY - chart.plotTop - offset.top;
+var xAxis = chart.xAxis[0];
+//remove old plot line and draw new plot line (crosshair) for this chart
+var xAxis1 = chart1.xAxis[0];
+xAxis1.removePlotLine("myPlotLineId");
+xAxis1.addPlotLine({
+value: chart.xAxis[0].translate(x, true),
+        width: 1,
+        color: 'gray',
+        //dashStyle: 'dash',                   
+        id: "myPlotLineId"
+});
+//remove old crosshair and draw new crosshair on chart2
+var xAxis2 = chart2.xAxis[0];
+xAxis2.removePlotLine("myPlotLineId");
+xAxis2.addPlotLine({
+value: chart.xAxis[0].translate(x, true),
+        width: 1,
+        color: 'gray',
+        //dashStyle: 'dash',                   
+        id: "myPlotLineId"
+});
+//if you have other charts that need to be syncronized - update their crosshair (plot line) in the same way in this function.                   
+});
+}
 
-            x = evt.clientX - chart.plotLeft - offset.left;
-            y = evt.clientY - chart.plotTop - offset.top;
-            var xAxis = chart.xAxis[0];
-            //remove old plot line and draw new plot line (crosshair) for this chart
-            var xAxis1 = chart1.xAxis[0];
-            xAxis1.removePlotLine("myPlotLineId");
-            xAxis1.addPlotLine({
-                value: chart.xAxis[0].translate(x, true),
-                width: 1,
-                color: 'gray',
-                //dashStyle: 'dash',                   
-                id: "myPlotLineId"
-            });
-            //remove old crosshair and draw new crosshair on chart2
-            var xAxis2 = chart2.xAxis[0];
-            xAxis2.removePlotLine("myPlotLineId");
-            xAxis2.addPlotLine({
-                value: chart.xAxis[0].translate(x, true),
-                width: 1,
-                color: 'gray',
-                //dashStyle: 'dash',                   
-                id: "myPlotLineId"
-            });
-
-
-
-
-            //if you have other charts that need to be syncronized - update their crosshair (plot line) in the same way in this function.                   
-        });
-    }
-
-    function syncExtremes(e) {
-        var thisChart = this.chart;
-
-        if (e.trigger !== 'syncExtremes') { // Prevent feedback loop
-            Highcharts.each(Highcharts.charts, function (chart) {
-                if (chart !== thisChart) {
-                    if (chart.xAxis[0].setExtremes) { // It is null while updating
-                        chart.xAxis[0].setExtremes(e.min, e.max, undefined, false, {trigger: 'syncExtremes'});
-                    }
-                }
-            });
-        }
-    }
+function syncExtremes(e) {
+var thisChart = this.chart;
+if (e.trigger !== 'syncExtremes') { // Prevent feedback loop
+Highcharts.each(Highcharts.charts, function (chart) {
+if (chart !== thisChart) {
+if (chart.xAxis[0].setExtremes) { // It is null while updating
+chart.xAxis[0].setExtremes(e.min, e.max, undefined, false, {trigger: 'syncExtremes'});
+}
+}
+});
+}
+}
 
 
 
 // Get the data. The contents of the data file can be viewed at
-    var i = 0;
-    for (var i = 0; i < 2; i++) {
+var i = 0;
+for (var i = 0; i < 2; i++) {
 
-        // Add X values
+// Add X values
 //            dataset.data = Highcharts.map(dataset.data, function (val, j) {
 //                return [activity.xData[j], val];
 //            });
-        //document.getElementById("whereToPrint").innerHTML = JSON.stringify(dataset.data, null, 4);
+//document.getElementById("whereToPrint").innerHTML = JSON.stringify(dataset.data, null, 4);
 
-        var chartDiv = document.createElement('div');
-        chartDiv.className = 'chart';
-        document.getElementById('container').appendChild(chartDiv);
-        if (i === 0) {
-            chart1 = Highcharts.chart(chartDiv, {
+var chartDiv = document.createElement('div');
+chartDiv.className = 'chart';
+document.getElementById('container').appendChild(chartDiv);
+if (i === 0) {
+chart1 = Highcharts.chart(chartDiv, {
 
-                chart: {
-                    type: 'line',
-                    zoomType: 'x',
-                    panning: true,
-                    panKey: 'shift',
-
+chart: {
+type: 'line',
+        zoomType: 'x',
+        panning: true,
+        panKey: 'shift',
+},
+        title: {
+        text: 'Run ' + <?php echo $enregistrement->id ?>
+        },
+        subtitle: {
+        text: document.ontouchstart === undefined ?
+                'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
+        },
+        xAxis: {
+        type: 'datetime',
+                plotBands: [<?php echo $plotbands ?>],
+                labels: {
+                enabled: false
                 },
-                title: {
-                    text: 'Run ' + <?php echo $enregistrement->id ?>
-                },
-                subtitle: {
-                    text: document.ontouchstart === undefined ?
-                            'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
-                },
-                xAxis: {
-                    type: 'datetime',
-                    visible: false,
-
-                    maxZoom: 1000 * 60,
-                    labels: {
-
-                    },
-                    crosshair: true,
-                    events: {
-                        setExtremes: syncExtremes
-                    }
-                },
-                yAxis: {
-                    title: {
-                        text: ''
-                    },
-                    gridLineWidth: 0,
-                    minorGridLineWidth: 0
-                },
-                legend: {
-                    layout: 'vertical',
-                    align: 'right',
-                    verticalAlign: 'middle',
-                    itemWidth: 160,
-
-                },
-                plotOptions: {
-                    series: {enabled: false,
-                        marker: {
-                            enabled: false
-                        }
-                    }
-                }, tooltip: {
-
-                    shared: true
-
-                },
-                series: [{
-<?php echo $analogiqueSeries2; ?>
-                    }],
-                exporting: {
-                    sourceWidth: 1250,
-                    sourceHeight: 500,
-                    // scale: 2 (default)
-                    chartOptions: {
-                        subtitle: null
-                    },
-                    enabled: false
-                },
-                credits: {
-                    enabled: false
+        maxZoom: 1000 * 60,
+                crosshair: true,
+                events: {
+                setExtremes: syncExtremes
                 }
-
-
-            }, function (chart) {
-                syncronizeCrossHairs(chart);
-            });
+        },
+        yAxis: {
+        title: {
+        text: ''
+        },
+                gridLineWidth: 0,
+                minorGridLineWidth: 0
+        },
+        legend: {
+        layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                itemWidth: 160,
+        },
+        plotOptions: {
+        series: {enabled: false,
+                marker: {
+                enabled: false
+                }
         }
-        if (i === 1) {
-            chart2 = Highcharts.chart(chartDiv, {
-                chart: {
-                    type: 'xrange',
-                    zoomType: 'x',
-                    panning: true,
-                    panKey: 'shift',
+        }, tooltip: {
 
+shared: true
+
+},
+        series: [{
+<?php echo $analogiqueSeries2; ?>
+        }],
+        exporting: {
+        sourceWidth: 1250,
+                sourceHeight: 500,
+                // scale: 2 (default)
+                chartOptions: {
+                subtitle: null
                 },
-                title: {
-                    text: ''
-                },
-                xAxis: {
-                    type: 'datetime',
-                    minTickInterval: 1000,
-                    maxZoom: 1000 * 60,
-                    crosshair: {
-                        snap: false,
+                enabled: false
+        },
+        credits: {
+        enabled: false
+        }
+
+
+}, function (chart) {
+syncronizeCrossHairs(chart);
+});
+}
+if (i === 1) {
+chart2 = Highcharts.chart(chartDiv, {
+chart: {
+type: 'xrange',
+        zoomType: 'x',
+        panning: true,
+        panKey: 'shift',
+},
+        title: {
+        text: ''
+        },
+        xAxis: {
+        type: 'datetime',
+                minTickInterval: 1000,
+                maxZoom: 1000 * 60,
+                crosshair: {
+                snap: false,
                         zIndex: 100
-                    },
-                    events: {
-                        setExtremes: syncExtremes
-                    }
                 },
-                yAxis: {
+                events: {
+                setExtremes: syncExtremes
+                }
+        },
+        yAxis: {
 
-                    gridLineWidth: 0,
-                    minorGridLineWidth: 0,
-                    labels: {
-                        enabled: false
-                    },
-                    categories: [''],
-                    reversed: true
+        gridLineWidth: 0,
+                minorGridLineWidth: 0,
+                labels: {
+                enabled: false
                 },
-                plotOptions: {
-                    series: {
-                        colorByPoint: true,
-                        allowPointSelect: true,
-                    }
-                },
-                legend: {
-                    symbolHeight: 11,
-                    symbolWidth: 15,
-                    symbolRadius: 12,
-                    layout: 'vertical',
-                    align: 'right',
-                    verticalAlign: 'middle',
-                    itemWidth: 160,
-                    y: <?php echo $legendY;?>,
-                    itemMarginTop: <?php echo $legendMarginTop;?>,
-                    itemStyle: {
-                        color: '#000000',
+                categories: [''],
+                reversed: true
+        },
+        plotOptions: {
+        series: {
+        colorByPoint: true,
+                allowPointSelect: true,
+        }
+        },
+        legend: {
+        symbolHeight: 11,
+                symbolWidth: 15,
+                symbolRadius: 12,
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                itemWidth: 160,
+                y: <?php echo $legendY; ?>,
+                itemMarginTop: <?php echo $legendMarginTop; ?>,
+                itemStyle: {
+                color: '#000000',
                         fontWeight: 'bold',
                         fontSize: '12px'
-                    }
-                }, tooltip: {
-                    crosshairs: [true, false],
-                    followPointer: true,
-                    followTouchMove: true,
-                    backgroundColor: '#FFFFFF',
-                    crosshairs: {
-                        width: 5
-                    },
-
-                },
-                series: [{
+                }
+        }, tooltip: {
+crosshairs: [true, false],
+        followPointer: true,
+        followTouchMove: true,
+        backgroundColor: '#FFFFFF',
+        crosshairs: {
+        width: 5
+        },
+},
+        series: [{
 <?php echo $sequenceSeries2; ?>
-                    }],
-                exporting: {
-                    sourceWidth: 1250,
-                    sourceHeight: 500,
-                    // scale: 2 (default)
-                    chartOptions: {
-                        subtitle: null
-                    },
-                    enabled: false
+        }],
+        exporting: {
+        sourceWidth: 1250,
+                sourceHeight: 500,
+                // scale: 2 (default)
+                chartOptions: {
+                subtitle: null
                 },
-                credits: {
-                    enabled: false
-                },
-            }, function (chart) {
-                syncronizeCrossHairs(chart);
-            });
-        }
-    }
+                enabled: false
+        },
+        credits: {
+        enabled: false
+        },
+}, function (chart) {
+syncronizeCrossHairs(chart);
+});
+}
+}
 //    chart1.reflow();
 //    chart2.reflow();
 
 
 
-    $('#export-pdf').click(function () {
-        Highcharts.exportCharts([chart1, chart2], {
-            type: 'application/pdf'
-        });
-    });
-
-
-
-
+$('#export-pdf').click(function () {
+Highcharts.exportCharts([chart1, chart2], {
+type: 'application/pdf'
+});
+});
 });
 
 
@@ -691,35 +702,3 @@ $(function () {
 
 
 
-<!--Highcharts.chart('container', {
-chart: {
-zoomType: 'x'
-
-},
-    xAxis: {
-    maxZoom: 1000 * 60,
-        plotLines: [{
-            color: 'red',
-            width: 3,
-            value: Date.UTC(2010, 0, 4,0,1,0),
-            zIndex: 3
-        },{
-        color: 'red',
-            width: 3,
-            value: Date.UTC(2010, 0, 4,0,1,0,5),
-            zIndex: 3
-        }],
-        tickInterval: 3600, // one day
-        type: 'datetime'
-    },
-
-    series: [{
-        data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4],
-        pointStart: Date.UTC(2010, 0, 1),
-        pointInterval: 24 * 3600 * 1000
-    },{
-    data: [29.9,50,50,50,50,50,50,50,50,50],
-        pointStart: Date.UTC(2010, 0, 1),
-        pointInterval: 24 * 3600 * 1000
-    }]
-});-->

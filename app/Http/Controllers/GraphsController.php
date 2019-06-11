@@ -20,9 +20,10 @@ class GraphsController extends Controller
         $enregistrement = Ca_enregistrement::all()->last();
         $enregistrement_last_id = Ca_enregistrement::all()->last()->id;
         $materiels = Ca_enregistrement::all()->last()->materiel_autonome->Ca_enregistrement_graphe_config;
+        $all_alarmes = \App\Alarme::all();
         
 
-        return view('layouts.graphes',compact('enregistrement','materiels','enregistrement_last_id'));
+        return view('layouts.graphes',compact('enregistrement','materiels','enregistrement_last_id','all_alarmes'));
     }
 
     /**
@@ -57,9 +58,10 @@ class GraphsController extends Controller
         $enregistrement = Ca_enregistrement::find($id);
         $enregistrement_last_id = Ca_enregistrement::all()->last()->id;
         $materiels = Ca_enregistrement::all()->last()->materiel_autonome->Ca_enregistrement_graphe_config;
+        $all_alarmes = \App\Alarme::all();
  
 
-         return view('layouts.graphes', compact('enregistrement','enregistrement_last_id','materiels'));
+         return view('layouts.graphes', compact('enregistrement','enregistrement_last_id','materiels','all_alarmes'));
     }
 
     /**
