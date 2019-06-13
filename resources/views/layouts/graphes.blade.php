@@ -33,10 +33,12 @@
                     </div>
 
                     <?php
-                    $y = 0;
                     $current_config = 0;
                     $analogiqueSeries = null;
+                    $analogiqueSeriesData = array();
                     $sequenceSeries = null;
+                    $sequenceSeriesData = array();
+                    $sequenceDates = array();
                     $plotbands = null;
                     $annee = null;
                     $mois = null;
@@ -44,6 +46,7 @@
                     $heure = null;
                     $minute = null;
                     $seconde = null;
+
                     $dates_alarmes = array();
                     $en_attente = array();
                     foreach ($all_alarmes as $alarme) {
@@ -59,132 +62,139 @@
                         return random_color_part() . random_color_part() . random_color_part();
                     }
 
-                   
-
                     foreach ($materiels as $config) {
-                        $code = $config->code;
-
                         if ($config->type == 1) {
-                            $current_config++;
-                            $analogiqueSeries .= 'name: \'' . $config->name . '\',';
-                            $analogiqueSeries .= 'marker:{states:{hover:{enabled:false}}},';
-                            $analogiqueSeries .= 'tooltip: {pointFormatter: function () {return this.myData +\'<br\><span style=\"color:\' + this.color + \'\">\u25CF</span> \' + this.series.name + \': <b>\' + this.y + \'</b><br/>\';}},';
-                            $analogiqueSeries .= 'data: [';
+                            $analogiqueSeriesData[$config->code] = null;
                         } else if ($config->type == 2) {
-                            $color = random_color();
-                            $sequenceSeries .= 'name: \'' . $config->name . '\',';
-                            $sequenceSeries .= 'pointWidth: 5,';
-                            $sequenceSeries .= 'color: \'#' . $color . '\',';
-                            $sequenceSeries .= 'data: [';
-                            $date_debut = null;
-                            $date_fin = null;
-                            $date_fin_ok = false;
-                            $y ++;
+                            $sequenceSeriesData[$config->code] = null;
+                            $sequenceDates[$config->code."date_debut"] = null;
+                            $sequenceDates[$config->code."date_fin"] = null;
+                            $sequenceDates[$config->code."date_fin_ok"] = null;
+                            $sequenceDates[$config->code."color"] = random_color();;
+                        }
+                    }
+
+                    foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
+                        $date = new DateTime($datas->_date);
+                        $annee = $date->format('Y');
+                        $mois = $date->format('m') - 1;
+                        $jour = $date->format('d');
+                        $heure = $date->format('H');
+                        $minute = $date->format('i');
+                        $seconde = $date->format('s');
+                        if ($mois[0] == "0") {
+                            $mois = substr($mois, 1);
+                        }
+                        if ($jour[0] == "0") {
+                            $jour = substr($jour, 1);
+                        }
+                        if ($heure[0] == "0") {
+                            $heure = substr($heure, 1);
+                        }
+                        if ($minute[0] == "0") {
+                            $minute = substr($minute, 1);
+                        }
+                        if ($seconde[0] == "0") {
+                            $seconde = substr($seconde, 1);
+                        }
+                        $alarmes = explode(",", $datas->alarmes);
+                        $display = null;
+
+
+
+
+                        foreach ($all_alarmes as $all_alarme) {
+
+                            if (in_array($all_alarme->id, $alarmes) && is_null($dates_alarmes[$all_alarme->id . "debut"])) {
+
+                                $dates_alarmes[$all_alarme->id . "debut"] = 'Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . ')';
+                                //echo"La date debut de l'alarme " . $all_alarme->id . "est  : " . $dates_alarmes[$all_alarme->id . "debut"];
+                            }
+
+                            if (!in_array($all_alarme->id, $alarmes) && !is_null($dates_alarmes[$all_alarme->id . "debut"])) {
+                                $dates_alarmes[$all_alarme->id . "fin"] = 'Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . ')';
+                                if ($all_alarme->critical_level == 1) {
+                                    $colorBand = '#FF7F50';
+                                    $plotbands .= '{color: \'' . $colorBand . '\',from: ' . $dates_alarmes[$all_alarme->id . "debut"] . ',to: ' . $dates_alarmes[$all_alarme->id . "fin"] . ',},';
+                                } else {
+                                    $colorBand = '#ff4040';
+                                    array_push($en_attente, '{color: \'' . $colorBand . '\',from: ' . $dates_alarmes[$all_alarme->id . 'debut'] . ',to: ' . $dates_alarmes[$all_alarme->id . 'fin'] . ',},');
+                                }
+                                //echo"La date fin de l'alarme " . $all_alarme->id . "est  : " . $dates_alarmes[$all_alarme->id . "fin"];
+                                $dates_alarmes[$all_alarme->id . 'debut'] = null;
+                            }
+
+
+                            if (is_null($dates_alarmes[$all_alarme->id . 'fin']) && $enregistrement->stloup_pasteurisateur_standardisation_data->last()->is($datas) && in_array($all_alarme->id, $alarmes)) {
+                                $dates_alarmes[$all_alarme->id . 'fin'] = 'Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . ')';
+                                if ($all_alarme->critical_level == 1) {
+                                    $colorBand = '#FF7F50';
+                                    $plotbands .= '{color: \'' . $colorBand . '\',from: ' . $dates_alarmes[$all_alarme->id . 'debut'] . ',to: ' . $dates_alarmes[$all_alarme->id . 'fin'] . ',},';
+                                } else {
+                                    $colorBand = '#ff4040';
+                                    array_push($en_attente, '{color: \'' . $colorBand . '\',from: ' . $dates_alarmes[$all_alarme->id . 'debut'] . ',to: ' . $dates_alarmes[$all_alarme->id . 'fin'] . ',},');
+                                }
+                                //echo"La date fin de l'alarme " . $all_alarme->id . "est  : " . $dates_alarmes[$all_alarme->id . "fin"];
+                                $dates_alarmes[$all_alarme->id . 'debut'] = null;
+                            }
                         }
 
-                        foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
-                            $date = new DateTime($datas->_date);
-                            $annee = $date->format('Y');
-                            $mois = $date->format('m') - 1;
-                            $jour = $date->format('d');
-                            $heure = $date->format('H');
-                            $minute = $date->format('i');
-                            $seconde = $date->format('s');
-                            if ($mois[0] == "0") {
-                                $mois = substr($mois, 1);
-                            }
-                            if ($jour[0] == "0") {
-                                $jour = substr($jour, 1);
-                            }
-                            if ($heure[0] == "0") {
-                                $heure = substr($heure, 1);
-                            }
-                            if ($minute[0] == "0") {
-                                $minute = substr($minute, 1);
-                            }
-                            if ($seconde[0] == "0") {
-                                $seconde = substr($seconde, 1);
-                            }
-                            $alarmes = explode(",", $datas->alarmes);
-                            $display = null;
 
 
-                            if ($current_config == 1) {
-
-                                foreach ($all_alarmes as $all_alarme) {
-
-                                    if (in_array($all_alarme->id, $alarmes) && is_null($dates_alarmes[$all_alarme->id . "debut"])) {
-
-                                        $dates_alarmes[$all_alarme->id . "debut"] = 'Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . ')';
-                                        //echo"La date debut de l'alarme " . $all_alarme->id . "est  : " . $dates_alarmes[$all_alarme->id . "debut"];
-                                    }
-
-                                    if (!in_array($all_alarme->id, $alarmes) && !is_null($dates_alarmes[$all_alarme->id . "debut"])) {
-                                        $dates_alarmes[$all_alarme->id . "fin"] = 'Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . ')';
-                                        if ($all_alarme->critical_level == 1) {
-                                            $color = '#FF7F50';
-                                            $plotbands .= '{color: \'' . $color . '\',from: ' . $dates_alarmes[$all_alarme->id . "debut"] . ',to: ' . $dates_alarmes[$all_alarme->id . "fin"] . ',},';
-                                        } else {
-                                            $color = '#ff4040';
-                                            array_push($en_attente, '{color: \'' . $color . '\',from: ' . $dates_alarmes[$all_alarme->id . 'debut'] . ',to: ' . $dates_alarmes[$all_alarme->id . 'fin'] . ',},');
-                                        }
-                                        //echo"La date fin de l'alarme " . $all_alarme->id . "est  : " . $dates_alarmes[$all_alarme->id . "fin"];
-                                        $dates_alarmes[$all_alarme->id . 'debut'] = null;
-                                    }
-
-
-                                    if (is_null($dates_alarmes[$all_alarme->id . 'fin']) && $enregistrement->stloup_pasteurisateur_standardisation_data->last()->is($datas) && in_array($all_alarme->id, $alarmes)) {
-                                        $dates_alarmes[$all_alarme->id . 'fin'] = 'Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . ')';
-                                        if ($all_alarme->critical_level == 1) {
-                                            $color = '#FF7F50';
-                                            $plotbands .= '{color: \'' . $color . '\',from: ' . $dates_alarmes[$all_alarme->id . 'debut'] . ',to: ' . $dates_alarmes[$all_alarme->id . 'fin'] . ',},';
-                                        } else {
-                                            $color = '#ff4040';
-                                            array_push($en_attente, '{color: \'' . $color . '\',from: ' . $dates_alarmes[$all_alarme->id . 'debut'] . ',to: ' . $dates_alarmes[$all_alarme->id . 'fin'] . ',},');
-                                        }
-                                        //echo"La date fin de l'alarme " . $all_alarme->id . "est  : " . $dates_alarmes[$all_alarme->id . "fin"];
-                                        $dates_alarmes[$all_alarme->id . 'debut'] = null;
+                        foreach ($alarmes as $alarme) {
+                            foreach ($all_alarmes as $all_alarme) {
+                                if ($alarme == $all_alarme->id) {
+                                    if ($all_alarme->critical_level == 1) {
+                                        $display .= '<p style=\"color:#FF7F50\";>' . $all_alarme->name . '<br\>';
+                                    } else {
+                                        $display .= '<p style=\"color:#ff4040\";>' . $all_alarme->name . '<br\>';
                                     }
                                 }
                             }
-
-
-                            foreach ($alarmes as $alarme) {
-                                foreach ($all_alarmes as $all_alarme) {
-                                    if ($alarme == $all_alarme->id) {
-                                        if ($all_alarme->critical_level == 1) {
-                                            $display .= '<p style=\"color:#FF7F50\";>' . $all_alarme->name . '<br\>';
-                                        } else {
-                                            $display .= '<p style=\"color:#ff4040\";>' . $all_alarme->name . '<br\>';
-                                        }
-                                    }
-                                }
-                            }
-
+                        }
+                        $y = 0;
+                        $current_config = 0;
+                        
+                        foreach ($materiels as $config) {
+                            $current_config++;
+                            
+                            $code = $config->code;
+                            //echo $code;
+                            
                             if ($config->type == 1) {
-                                if ($current_config == 1) {
-                                    $analogiqueSeries .= '{x: Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . '), y : ' . $datas->$code . ', myData : \'' . $display . '\'},';
+                                echo  $current_config;
+                                if ($current_config == 2) {
+                                    
+                                    $analogiqueSeriesData[$config->code] = $analogiqueSeriesData[$config->code] . '{x: Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . '), y : ' . $datas->$code . ', myData : \'' . $display . '\'},';
                                 } else {
-                                    $analogiqueSeries .= '{x: Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . '), y : ' . $datas->$code . ', myData : \'\'},';
+                                    $analogiqueSeriesData[$config->code] = $analogiqueSeriesData[$config->code] . '{x: Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . '), y : ' . $datas->$code . ', myData : \'\'},';
                                 }
                             }
+
 
                             if ($config->type == 2) {
-                                if ($datas->$code == 1 && is_null($date_debut)) {
-                                    $date_debut = $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde;
-                                    $date_fin = null;
-                                    $date_fin_ok = false;
+                                $y++;
+                                
+                                if ($datas->$code == 1 && is_null($sequenceDates[$config->code."date_debut"])) {
+                                    $sequenceDates[$config->code."date_debut"] = $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde;
+                                    $sequenceDates[$config->code."date_fin"] = null;
+                                    $sequenceDates[$config->code."date_fin_ok"] = false;
                                 }
 
-                                if ($datas->$code == 0 && !is_null($date_debut) && $date_fin_ok == 0) {
-                                    $date_fin = $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde;
-                                    $date_fin_ok = true;
+                                if ($datas->$code == 0 && !is_null($sequenceDates[$config->code."date_debut"]) && $sequenceDates[$config->code."date_fin_ok"] == 0) {
+                                    $sequenceDates[$config->code."date_fin"] = $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde;
+                                    $sequenceDates[$config->code."date_fin_ok"] = true;
+                                    //echo $y." ".$config->code."| ";
 
-                                    $sequenceSeries .= '{x: Date.UTC(' . $date_debut . '),x2: Date.UTC(' . $date_fin . '),y: ' . $y . ',color: \'#' . $color . '\' },';
-                                    $date_debut = null;
+                                    $sequenceSeriesData[$config->code] .= '{x: Date.UTC(' . $sequenceDates[$config->code."date_debut"] . '),x2: Date.UTC(' . $sequenceDates[$config->code."date_fin"] . '),y: ' . $y . ',color: \'#' . $sequenceDates[$config->code."color"] . '\' },';
+                                    $sequenceDates[$config->code."date_debut"] = null;
+                                    $sequenceDates[$config->code."date_fin"] = null;
                                 }
                             }
                         }
+                    }
+                    $y = 0;
+                    foreach ($materiels as $config) {
                         if ($current_config == 1) {
                             foreach ($en_attente as $attente) {
                                 $plotbands .= $attente;
@@ -193,19 +203,45 @@
 
 
                         if ($config->type == 1) {
-                            $analogiqueSeries .= ']},{';
+                            $analogiqueSeriesData[$config->code] .= ']},{';
                         }
                         if ($config->type == 2) {
+                            $y++;
 
-                            if (is_null($date_fin)) {
-                                $date_fin = $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde;
-                                $sequenceSeries .= '{x: Date.UTC(' . $date_debut . '),x2: Date.UTC(' . $date_fin . '),y: ' . $y . ',' . 'color: \'#' . $color . '\'}';
+                            if (is_null($sequenceDates[$config->code."date_fin"])) {
+                                $sequenceDates[$config->code."date_fin"] = $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde;
+                                $sequenceSeriesData[$config->code] .= '{x: Date.UTC(' . $sequenceDates[$config->code."date_debut"] . '),x2: Date.UTC(' .  $sequenceDates[$config->code."date_fin"]. '),y: ' . $y . ',' . 'color: \'#' . $sequenceDates[$config->code."color"] . '\'}';
                             }
-                            $sequenceSeries .= '],}, {';
+                             $sequenceSeriesData[$config->code] .= '],}, {';
                         }
                     }
+
+                    foreach ($materiels as $config) {
+
+
+                        if ($config->type == 1) {
+                            //$analogiqueSeriesData[$config->code] = rtrim($analogiqueSeriesData[$config->code], '},{');
+                            $analogiqueSeries .= 'name: \'' . $config->name . '\',';
+                            $analogiqueSeries .= 'marker:{states:{hover:{enabled:false}}},';
+                            $analogiqueSeries .= 'tooltip: {pointFormatter: function () {return this.myData +\'<br\><span style=\"color:\' + this.color + \'\">\u25CF</span> \' + this.series.name + \': <b>\' + this.y + \'</b><br/>\';}},';
+                            $analogiqueSeries .= 'data: [';
+                            $analogiqueSeries .= $analogiqueSeriesData[$config->code];
+                        } else if ($config->type == 2) {
+                            //$sequenceSeriesData[$config->code] = rtrim($sequenceSeriesData[$config->code], ',}, { ');
+
+                            $sequenceSeries .= 'name: \'' . $config->name . '\',';
+                            $sequenceSeries .= 'pointWidth: 5,';
+                            $sequenceSeries .= 'color: \'#' . $sequenceDates[$config->code."color"] . '\',';
+                            $sequenceSeries .= 'data: [';
+                            $sequenceSeries .= $sequenceSeriesData[$config->code];
+                        }
+                    }
+
                     $sequenceSeries2 = rtrim($sequenceSeries, ',}, { ');
                     $analogiqueSeries2 = rtrim($analogiqueSeries, '},{');
+                    echo $analogiqueSeries2;
+//                    echo $sequenceSeries2;
+                    //  dd($analogiqueSeriesData);
 
                     $legendMarginTop = null;
                     $legendY = 0;
