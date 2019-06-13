@@ -84,7 +84,16 @@ class GraphsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+       $comment = $request->input('comment');
+        $id = $request->input('comment_id');
+        $enregistrement = Ca_enregistrement::find($id);
+        $enregistrement->commentaire = $comment;
+        $enregistrement->save();
+        $enregistrement_last_id = Ca_enregistrement::all()->last()->id;
+        $materiels = Ca_enregistrement::all()->last()->materiel_autonome->Ca_enregistrement_graphe_config;
+        $all_alarmes = \App\Alarme::all();
+
+        return view('layouts.graphes', compact('enregistrement','materiels','all_alarmes','enregistrement_last_id'));
     }
 
     /**

@@ -31,6 +31,7 @@ Route::group(['middleware' => 'auth'], function() {
     ]]);
     Route::resource('graphes', 'GraphsController', ['names' => [
             'index' => 'graphes.index',
-            'show' => 'graphes.show'
+            'show' => 'graphes.show',
+            'update' => 'graphes.update'
     ]]);
 });

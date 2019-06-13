@@ -89,6 +89,7 @@ class RecordsController extends Controller
      */
     public function update(Request $request, $id)
     {
+        
         $comment = $request->input('comment');
         $id = $request->input('comment_id');
         $enregistrement = Ca_enregistrement::find($id);

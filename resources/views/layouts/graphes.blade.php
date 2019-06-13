@@ -51,8 +51,6 @@
                         $dates_alarmes[$alarme->id . "fin"] = null;
                     }
 
-                    //var_dump($dates_alarmes);
-
                     function random_color_part() {
                         return str_pad(dechex(mt_rand(0, 255)), 2, '0', STR_PAD_LEFT);
                     }
@@ -80,7 +78,7 @@
                             if (in_array($all_alarme->id, $alarmes) && is_null($dates_alarmes[$all_alarme->id . "debut"])) {
 
                                 $dates_alarmes[$all_alarme->id . "debut"] = "Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")";
-                                echo"La date debut de l'alarme " . $all_alarme->id . "est  : " . $dates_alarmes[$all_alarme->id . "debut"];
+                                //echo"La date debut de l'alarme " . $all_alarme->id . "est  : " . $dates_alarmes[$all_alarme->id . "debut"];
                             }
 
                             if (!in_array($all_alarme->id, $alarmes) && !is_null($dates_alarmes[$all_alarme->id . "debut"])) {
@@ -92,11 +90,11 @@
                                     $color = "#ff4040";
                                     array_push($en_attente, "{color: '" . $color . "',from: " . $dates_alarmes[$all_alarme->id . "debut"] . ",to: " . $dates_alarmes[$all_alarme->id . "fin"] . ",},");
                                 }
-                                echo"La date fin de l'alarme " . $all_alarme->id . "est  : " . $dates_alarmes[$all_alarme->id . "fin"];
+                                //echo"La date fin de l'alarme " . $all_alarme->id . "est  : " . $dates_alarmes[$all_alarme->id . "fin"];
                                 $dates_alarmes[$all_alarme->id . "debut"] = null;
                             }
-                            
-                            
+
+
                             if (is_null($dates_alarmes[$all_alarme->id . "fin"]) && $enregistrement->stloup_pasteurisateur_standardisation_data->last()->is($datas) && in_array($all_alarme->id, $alarmes)) {
                                 $dates_alarmes[$all_alarme->id . "fin"] = "Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . ")";
                                 if ($all_alarme->critical_level == 1) {
@@ -106,7 +104,7 @@
                                     $color = "#ff4040";
                                     array_push($en_attente, "{color: '" . $color . "',from: " . $dates_alarmes[$all_alarme->id . "debut"] . ",to: " . $dates_alarmes[$all_alarme->id . "fin"] . ",},");
                                 }
-                                echo"La date fin de l'alarme " . $all_alarme->id . "est  : " . $dates_alarmes[$all_alarme->id . "fin"];
+                                //echo"La date fin de l'alarme " . $all_alarme->id . "est  : " . $dates_alarmes[$all_alarme->id . "fin"];
                                 $dates_alarmes[$all_alarme->id . "debut"] = null;
                             }
                         }
@@ -114,9 +112,6 @@
                     foreach ($en_attente as $attente) {
                         $plotbands .= $attente;
                     }
-
-                    //$plotbands = "{color: '#FF7F50',from: Date.UTC(2019,5,03,08,00,00),to: Date.UTC(2019,5,03,09,00,01)},{color: '#ff4040',from: Date.UTC(2019,5,03,08,15,01),to: Date.UTC(2019,5,03,08,45,01),},";
-                    echo $plotbands;
                     foreach ($materiels as $config) {
                         $code = $config->code;
 
@@ -127,9 +122,6 @@
                             $analogiqueSeries .= "marker:{states:{hover:{enabled:false}}},";
                             $analogiqueSeries .= "tooltip: {pointFormatter: function () {return this.myData +'<br\><span style=\"color:' + this.color + '\">\u25CF</span> ' + this.series.name + ': <b>' + this.y + '</b><br/>';}},";
                             $analogiqueSeries .= "data: [";
-
-
-
 
                             foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
                                 $alarmes = explode(",", $datas->alarmes);
@@ -339,6 +331,57 @@
                             </li>
 
                             <li><button id="export-pdf" class="btn btn-primary"><i class="fas fa-print"></i></button></li>
+                            <li>
+
+                                @if(is_null($enregistrement->commentaire))
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-id="{{$enregistrement->id}}" data-whatever="{{$enregistrement->commentaire}}">
+                                    <i class="far fa-comment-alt"></i>
+                                </button>
+                                @else 
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-id="{{$enregistrement->id}}" data-whatever="{{$enregistrement->commentaire}}" >
+                                    @php
+
+                                    $enregistrement_commentaire = [];
+                                    array_push($enregistrement_commentaire,$enregistrement->commentaire);
+
+                                    echo '<i class="fas fa-comment-alt" data-toggle="tooltip" data-html="true" title="'.implode("<br>",$enregistrement_commentaire).'"></i>';
+
+                                    @endphp
+                                </button>
+                                <p hidden>{{$enregistrement->commentaire}}</p>
+
+                                @endif
+
+                                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Commentaire</h5>
+
+                                            </div>
+                                            <div class="modal-body">
+                                                {!! Form::model($enregistrement, ['method'=>'PATCH', 'action'=> ['GraphsController@update', $enregistrement->id]]) !!}
+
+                                                <div class="form-group">
+
+                                                    <input type="hidden" name="comment_id" id="hiddenValue" value="" />
+
+<!--                                                                            <textarea class="form-control" id="comment"></textarea>-->
+
+
+                                                    {!! Form::textarea('comment', null, ['class'=>'form-control' , 'rows' => 3, 'id'=>'comment' ,'placeholder' => 'Ecrivez votre commentaire..'])!!}
+                                                </div>
+
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary no_print" data-dismiss="modal">Fermer</button>
+                                                {!! Form::submit('Mettre à jour', ['class'=>'btn btn-primary']) !!}
+                                            </div>
+                                            {!! Form::close() !!}
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
 
 
                             @if($enregistrement->id+1 > $enregistrement_last_id)
@@ -377,12 +420,13 @@ $(function () {
             var svg = chart.getSVG();
             svg = svg.replace('<svg', '<g transform="translate(0,' + top + ')" ');
             svg = svg.replace('</svg>', '</g>');
-            svg = svg.replace('-9000000000', '-999'); // Bug in v4.2.6
+
 
             top += chart.chartHeight;
             width = Math.max(width, chart.chartWidth);
             svgArr.push(svg);
         });
+        top += 100;
         return '<svg height="' + top + '" width="' + width + '" version="1.1" xmlns="http://www.w3.org/2000/svg">' + svgArr.join('') + '</svg>';
     };
     /**
@@ -452,23 +496,7 @@ $(function () {
 
     Highcharts.seriesTypes.column.prototype.drawLegendSymbol =
             Highcharts.seriesTypes.line.prototype.drawLegendSymbol;
-//
-//    $('#container').bind('mouseleave mouseout ', function (e) {
-//        var chart,
-//                point,
-//                i,
-//                event;
-//
-//        for (i = 0; i < Highcharts.charts.length; i = i + 1) {
-//            chart = Highcharts.charts[i];
-//            event = chart.pointer.normalize(e.originalEvent);
-//            point = chart.series[0].searchPoint(event, true);
-//
-//            point.onMouseOut();
-//            chart.tooltip.hide(point);
-//            chart.xAxis[0].hideCrosshair();
-//        }
-//    });
+
 
     var container_title = "Root Zone Soil Moisture Depletion:";
     var xrange_title = "Growth Stages";
@@ -529,12 +557,6 @@ $(function () {
 // Get the data. The contents of the data file can be viewed at
     var i = 0;
     for (var i = 0; i < 2; i++) {
-
-// Add X values
-//            dataset.data = Highcharts.map(dataset.data, function (val, j) {
-//                return [activity.xData[j], val];
-//            });
-//document.getElementById("whereToPrint").innerHTML = JSON.stringify(dataset.data, null, 4);
 
         var chartDiv = document.createElement('div');
         chartDiv.className = 'chart';
@@ -733,6 +755,26 @@ $(function () {
 
 
     @include('includes.bottom_scripts')
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+        $('#exampleModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget) // Button that triggered the modal
+            var comment = button.data('whatever') // Extract info from data-* attributes
+            // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+            // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+            var modal = $(this)
+            modal.find('.modal-body #comment').val(comment)
+
+        })
+
+
+        $('#exampleModal').on('show.bs.modal', function (event) {
+            var my_id_value = $(event.relatedTarget).data('id');
+            $(".modal-body #hiddenValue").val(my_id_value);
+        })
+    </script>
 
 
 

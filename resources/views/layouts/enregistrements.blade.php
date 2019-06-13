@@ -159,7 +159,7 @@
                                                     @endif
 
                                                     @if(!is_null($enregistrement->test_delta_pression))
-                                                   
+
                                                     @if($enregistrement->test_delta_pression_valide == 0 && !is_null($enregistrement->test_delta_pression_valide))
                                                     <td class="table-danger">{{$enregistrement->test_delta_pression ? $enregistrement->test_delta_pression : ""}}</td>
                                                     @elseif($enregistrement->test_delta_pression_valide == 1)
@@ -173,12 +173,12 @@
 
                                                     <td class="text-center align-middle">
                                                         @if(is_null($enregistrement->validation_globale))
-                                                            <i class="fas fa-times"></i>
+                                                        <i class="fas fa-times"></i>
                                                         @else
                                                         {{$enregistrement->validation_globale}}
-                                                        
+
                                                         @endif
-                                                    
+
                                                     </td>
                                                     <td class="text-center align-middle">
                                                         @php
@@ -268,7 +268,7 @@
                                                                         <div class="form-group">
 
                                                                             <input type="hidden" name="comment_id" id="hiddenValue" value="" />
-                                                                            
+
 <!--                                                                            <textarea class="form-control" id="comment"></textarea>-->
 
 
@@ -339,24 +339,25 @@
         <script src="vendor/datatables/jquery.dataTables.min.js"></script>
         <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
         <script>
-                                                                $(document).ready(function () {
-                                                                    $('[data-toggle="tooltip"]').tooltip();
-                                                                });
-                                                                $('#exampleModal').on('show.bs.modal', function (event) {
-                                                                    var button = $(event.relatedTarget) // Button that triggered the modal
-                                                                    var comment = button.data('whatever') // Extract info from data-* attributes
-                                                                    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-                                                                    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-                                                                    var modal = $(this)
-                                                                    modal.find('.modal-body #comment').val(comment)
+                                                            $(document).ready(function () {
+                                                                $('[data-toggle="tooltip"]').tooltip();
+                                                            });
+                                                            $('#exampleModal').on('show.bs.modal', function (event) {
+                                                                var button = $(event.relatedTarget) // Button that triggered the modal
+                                                                var comment = button.data('whatever') // Extract info from data-* attributes
+                                                                // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+                                                                // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+                                                                var modal = $(this)
+                                                                modal.find('.modal-body #comment').val(comment)
 
-                                                                })
+                                                            })
 
 
-                                                                $('#exampleModal').on('show.bs.modal', function (event) {
-                                                                    var my_id_value = $(event.relatedTarget).data('id');
-                                                                    $(".modal-body #hiddenValue").val(my_id_value);
-                                                                })
+                                                            $('#exampleModal').on('show.bs.modal', function (event) {
+                                                                var my_id_value = $(event.relatedTarget).data('id');
+                                                                console.log(my_id_value);
+                                                                $(".modal-body #hiddenValue").val(my_id_value);
+                                                            })
         </script>
 
 
