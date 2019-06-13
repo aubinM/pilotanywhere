@@ -63,10 +63,8 @@
                         $date = new DateTime($datas->_date);
                         $annee = $date->format('Y');
                         $mois = $date->format('m') - 1;
-
                         $jour = $date->format('d');
                         $heure = $date->format('H');
-
                         $minute = $date->format('i');
                         $seconde = $date->format('s');
 
@@ -122,50 +120,6 @@
                             $analogiqueSeries .= "marker:{states:{hover:{enabled:false}}},";
                             $analogiqueSeries .= "tooltip: {pointFormatter: function () {return this.myData +'<br\><span style=\"color:' + this.color + '\">\u25CF</span> ' + this.series.name + ': <b>' + this.y + '</b><br/>';}},";
                             $analogiqueSeries .= "data: [";
-
-                            foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
-                                $alarmes = explode(",", $datas->alarmes);
-                                $display = null;
-                                foreach ($alarmes as $alarme) {
-                                    foreach ($all_alarmes as $all_alarme) {
-                                        if ($alarme == $all_alarme->id) {
-                                            if ($all_alarme->critical_level == 1) {
-                                                $display .= "<p style=\"color:#FF7F50\";>" . $all_alarme->name . "<br\>";
-                                            } else {
-                                                $display .= "<p style=\"color:#ff4040\";>" . $all_alarme->name . "<br\>";
-                                            }
-                                        }
-                                    }
-                                }
-                                $date = new DateTime($datas->_date);
-                                $annee = $date->format('Y');
-                                $mois = $date->format('m') - 1;
-                                $jour = $date->format('d');
-                                $heure = $date->format('H');
-                                $minute = $date->format('i');
-                                $seconde = $date->format('s');
-                                if ($mois[0] == "0") {
-                                    $mois = substr($mois, 1);
-                                }
-                                if ($jour[0] == "0") {
-                                    $jour = substr($jour, 1);
-                                }
-                                if ($heure[0] == "0") {
-                                    $heure = substr($heure, 1);
-                                }
-                                if ($minute[0] == "0") {
-                                    $minute = substr($minute, 1);
-                                }
-                                if ($seconde[0] == "0") {
-                                    $seconde = substr($seconde, 1);
-                                }
-                                if ($current_config == 1) {
-                                    $analogiqueSeries .= "{x: Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . "), y : " . $datas->$code . ", myData : '" . $display . "'},";
-                                } else {
-                                    $analogiqueSeries .= "{x: Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . "), y : " . $datas->$code . ", myData : ''},";
-                                }
-                            }
-                            $analogiqueSeries .= "]},{";
                         } else if ($config->type == 2) {
                             $color = random_color();
                             $sequenceSeries .= "name: '" . $config->name . "',";
@@ -176,36 +130,53 @@
                             $date_fin = null;
                             $date_fin_ok = false;
                             $y ++;
+                        }
 
-
-
-                            foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
-                                $date = new DateTime($datas->_date);
-
-
-                                $annee = $date->format('Y');
-                                $mois = $date->format('m') - 1;
-
-                                $jour = $date->format('d');
-                                $heure = $date->format('H');
-                                $minute = $date->format('i');
-                                $seconde = $date->format('s');
-                                if ($mois[0] == "0") {
-                                    $mois = substr($mois, 1);
+                        foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
+                            $alarmes = explode(",", $datas->alarmes);
+                            $display = null;
+                            foreach ($alarmes as $alarme) {
+                                foreach ($all_alarmes as $all_alarme) {
+                                    if ($alarme == $all_alarme->id) {
+                                        if ($all_alarme->critical_level == 1) {
+                                            $display .= "<p style=\"color:#FF7F50\";>" . $all_alarme->name . "<br\>";
+                                        } else {
+                                            $display .= "<p style=\"color:#ff4040\";>" . $all_alarme->name . "<br\>";
+                                        }
+                                    }
                                 }
-                                if ($jour[0] == "0") {
-                                    $jour = substr($jour, 1);
+                            }
+                            $date = new DateTime($datas->_date);
+                            $annee = $date->format('Y');
+                            $mois = $date->format('m') - 1;
+                            $jour = $date->format('d');
+                            $heure = $date->format('H');
+                            $minute = $date->format('i');
+                            $seconde = $date->format('s');
+                            if ($mois[0] == "0") {
+                                $mois = substr($mois, 1);
+                            }
+                            if ($jour[0] == "0") {
+                                $jour = substr($jour, 1);
+                            }
+                            if ($heure[0] == "0") {
+                                $heure = substr($heure, 1);
+                            }
+                            if ($minute[0] == "0") {
+                                $minute = substr($minute, 1);
+                            }
+                            if ($seconde[0] == "0") {
+                                $seconde = substr($seconde, 1);
+                            }
+                            if ($config->type == 1) {
+                                if ($current_config == 1) {
+                                    $analogiqueSeries .= "{x: Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . "), y : " . $datas->$code . ", myData : '" . $display . "'},";
+                                } else {
+                                    $analogiqueSeries .= "{x: Date.UTC(" . $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde . "), y : " . $datas->$code . ", myData : ''},";
                                 }
-                                if ($heure[0] == "0") {
-                                    $heure = substr($heure, 1);
-                                }
-                                if ($minute[0] == "0") {
-                                    $minute = substr($minute, 1);
-                                }
-                                if ($seconde[0] == "0") {
-                                    $seconde = substr($seconde, 1);
-                                }
+                            }
 
+                            if ($config->type == 2) {
                                 if ($datas->$code == 1 && is_null($date_debut)) {
                                     $date_debut = $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde;
                                     $date_fin = null;
@@ -220,6 +191,12 @@
                                     $date_debut = null;
                                 }
                             }
+                        }
+                        if ($config->type == 1) {
+                            $analogiqueSeries .= "]},{";
+                        }
+                        if ($config->type == 2) {
+
                             if (is_null($date_fin)) {
                                 $date_fin = $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde;
                                 $sequenceSeries .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . "," . "color: '#" . $color . "'}";
@@ -228,7 +205,9 @@
                         }
                     }
                     $sequenceSeries2 = rtrim($sequenceSeries, ',}, { ');
+
                     $analogiqueSeries2 = rtrim($analogiqueSeries, '},{');
+                    //dd($analogiqueSeries2);
 
                     $legendMarginTop = null;
                     $legendY = 0;
