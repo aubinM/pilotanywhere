@@ -9,7 +9,47 @@
 <script src="/js/highcharts/modules/data.js"></script>
 <script src="/js/jquery-3.4.0.min.js"></script>
 
+
+<style>
+    .spinner {
+        display: inline-block;
+        opacity: 0;
+        width: 0;
+        -webkit-transition: opacity 0.25s, width 0.25s;
+        -moz-transition: opacity 0.25s, width 0.25s;
+        -o-transition: opacity 0.25s, width 0.25s;
+        transition: opacity 0.25s, width 0.25s;
+    }
+    .has-spinner.active {
+        cursor:progress;
+    }
+    .has-spinner.active .spinner {
+        opacity: 1;
+        width: auto;
+    }
+
+    .has-spinner.btn.active .spinner {
+        min-width: 20px;
+    }
+    
+    .content {display:none;}
+.preload { width:100px;
+    height: 100px;
+    position: fixed;
+    top: 50%;
+    left: 50%;}
+
+</style>
+
+
+
+
+
 <body id="page-top">
+    
+    <div class="preload"><img src="/images/Ellipsis-1s-150px.gif">
+</div>
+
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -31,6 +71,7 @@
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Graphe @if(isset($enregistrement->id)) {{$enregistrement->id}} @endif</h1>
                     </div>
+
 
                     <?php
                     $current_config = 0;
@@ -54,27 +95,23 @@
                         $dates_alarmes[$alarme->id . "fin"] = null;
                     }
 
-                    function random_color_part() {
-                        return str_pad(dechex(mt_rand(0, 255)), 2, '0', STR_PAD_LEFT);
-                    }
 
-                    function random_color() {
-                        return random_color_part() . random_color_part() . random_color_part();
-                    }
+                    
 
-                    foreach ($materiels as $config) {
-                        if ($config->type == 1) {
-                            $analogiqueSeriesData[$config->code] = null;
-                        } else if ($config->type == 2) {
-                            $sequenceSeriesData[$config->code] = null;
-                            $sequenceDates[$config->code."date_debut"] = null;
-                            $sequenceDates[$config->code."date_fin"] = null;
-                            $sequenceDates[$config->code."date_fin_ok"] = null;
-                            $sequenceDates[$config->code."color"] = random_color();;
-                        }
-                    }
+
+                    $datetime1 = new DateTime($enregistrement->stloup_pasteurisateur_standardisation_data->first()->_date);
+                    $datetime2 = new DateTime($enregistrement->stloup_pasteurisateur_standardisation_data->last()->_date);
+                    $interval = $datetime1->diff($datetime2);
+                    $subtitle = "Début du run : " . $enregistrement->stloup_pasteurisateur_standardisation_data->first()->_date;
+                    $subtitle .= " | Fin du run : " . $enregistrement->stloup_pasteurisateur_standardisation_data->last()->_date;
+                    $subtitle .= $interval->format(" | Durée du run: %H Heures %I Minutes %S Secondes");
+
+                    //var_dump($enregistrement->stloup_pasteurisateur_standardisation_data);
 
                     foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
+
+
+
                         $date = new DateTime($datas->_date);
                         $annee = $date->format('Y');
                         $mois = $date->format('m') - 1;
@@ -138,110 +175,110 @@
                                 $dates_alarmes[$all_alarme->id . 'debut'] = null;
                             }
                         }
-
-
-
-                        foreach ($alarmes as $alarme) {
-                            foreach ($all_alarmes as $all_alarme) {
-                                if ($alarme == $all_alarme->id) {
-                                    if ($all_alarme->critical_level == 1) {
-                                        $display .= '<p style=\"color:#FF7F50\";>' . $all_alarme->name . '<br\>';
-                                    } else {
-                                        $display .= '<p style=\"color:#ff4040\";>' . $all_alarme->name . '<br\>';
-                                    }
-                                }
-                            }
-                        }
-                        $y = 0;
-                        $current_config = 0;
-                        
-                        foreach ($materiels as $config) {
-                            $current_config++;
-                            
-                            $code = $config->code;
-                            //echo $code;
-                            
-                            if ($config->type == 1) {
-                                echo  $current_config;
-                                if ($current_config == 2) {
-                                    
-                                    $analogiqueSeriesData[$config->code] = $analogiqueSeriesData[$config->code] . '{x: Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . '), y : ' . $datas->$code . ', myData : \'' . $display . '\'},';
-                                } else {
-                                    $analogiqueSeriesData[$config->code] = $analogiqueSeriesData[$config->code] . '{x: Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . '), y : ' . $datas->$code . ', myData : \'\'},';
-                                }
-                            }
-
-
-                            if ($config->type == 2) {
-                                $y++;
-                                
-                                if ($datas->$code == 1 && is_null($sequenceDates[$config->code."date_debut"])) {
-                                    $sequenceDates[$config->code."date_debut"] = $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde;
-                                    $sequenceDates[$config->code."date_fin"] = null;
-                                    $sequenceDates[$config->code."date_fin_ok"] = false;
-                                }
-
-                                if ($datas->$code == 0 && !is_null($sequenceDates[$config->code."date_debut"]) && $sequenceDates[$config->code."date_fin_ok"] == 0) {
-                                    $sequenceDates[$config->code."date_fin"] = $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde;
-                                    $sequenceDates[$config->code."date_fin_ok"] = true;
-                                    //echo $y." ".$config->code."| ";
-
-                                    $sequenceSeriesData[$config->code] .= '{x: Date.UTC(' . $sequenceDates[$config->code."date_debut"] . '),x2: Date.UTC(' . $sequenceDates[$config->code."date_fin"] . '),y: ' . $y . ',color: \'#' . $sequenceDates[$config->code."color"] . '\' },';
-                                    $sequenceDates[$config->code."date_debut"] = null;
-                                    $sequenceDates[$config->code."date_fin"] = null;
-                                }
-                            }
-                        }
                     }
                     $y = 0;
+                    $current_config = 0;
+
                     foreach ($materiels as $config) {
+                        $current_config++;
                         if ($current_config == 1) {
                             foreach ($en_attente as $attente) {
                                 $plotbands .= $attente;
                             }
                         }
-
-
                         if ($config->type == 1) {
-                            $analogiqueSeriesData[$config->code] .= ']},{';
-                        }
-                        if ($config->type == 2) {
-                            $y++;
-
-                            if (is_null($sequenceDates[$config->code."date_fin"])) {
-                                $sequenceDates[$config->code."date_fin"] = $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde;
-                                $sequenceSeriesData[$config->code] .= '{x: Date.UTC(' . $sequenceDates[$config->code."date_debut"] . '),x2: Date.UTC(' .  $sequenceDates[$config->code."date_fin"]. '),y: ' . $y . ',' . 'color: \'#' . $sequenceDates[$config->code."color"] . '\'}';
-                            }
-                             $sequenceSeriesData[$config->code] .= '],}, {';
-                        }
-                    }
-
-                    foreach ($materiels as $config) {
-
-
-                        if ($config->type == 1) {
-                            //$analogiqueSeriesData[$config->code] = rtrim($analogiqueSeriesData[$config->code], '},{');
-                            $analogiqueSeries .= 'name: \'' . $config->name . '\',';
-                            $analogiqueSeries .= 'marker:{states:{hover:{enabled:false}}},';
-                            $analogiqueSeries .= 'tooltip: {pointFormatter: function () {return this.myData +\'<br\><span style=\"color:\' + this.color + \'\">\u25CF</span> \' + this.series.name + \': <b>\' + this.y + \'</b><br/>\';}},';
-                            $analogiqueSeries .= 'data: [';
-                            $analogiqueSeries .= $analogiqueSeriesData[$config->code];
+                            $analogiqueSeries .= "name: '" . $config->name . "',";
+                            $analogiqueSeries .= "marker:{states:{hover:{enabled:false}}},";
+                            $analogiqueSeries .= "tooltip: {pointFormatter: function () {return this.myData +'<br\><span style=\"color:' + this.color + '\">\u25CF</span> ' + this.series.name + ': <b>' + this.y + '</b><br/>';}},";
+                            $analogiqueSeries .= "data: [";
                         } else if ($config->type == 2) {
-                            //$sequenceSeriesData[$config->code] = rtrim($sequenceSeriesData[$config->code], ',}, { ');
+                            $sequenceSeries .= "name: '" . $config->name . "',";
+                            $sequenceSeries .= "pointWidth: 5,";
+                            $sequenceSeries .= "color: '" . $config->hex . "',";
+                            $sequenceSeries .= "data: [";
+                            $date_debut = null;
+                            $date_fin = null;
+                            $date_fin_ok = false;
+                            $y ++;
+                        }
+                        foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
 
-                            $sequenceSeries .= 'name: \'' . $config->name . '\',';
-                            $sequenceSeries .= 'pointWidth: 5,';
-                            $sequenceSeries .= 'color: \'#' . $sequenceDates[$config->code."color"] . '\',';
-                            $sequenceSeries .= 'data: [';
-                            $sequenceSeries .= $sequenceSeriesData[$config->code];
+
+
+                            $date = new DateTime($datas->_date);
+                            $annee = $date->format('Y');
+                            $mois = $date->format('m') - 1;
+                            $jour = $date->format('d');
+                            $heure = $date->format('H');
+                            $minute = $date->format('i');
+                            $seconde = $date->format('s');
+
+
+                            $code = $config->code;
+                            //echo $code;
+
+                            if ($config->type == 1) {
+                                $alarmes = explode(",", $datas->alarmes);
+                                $display = null;
+                                foreach ($alarmes as $alarme) {
+                                    foreach ($all_alarmes as $all_alarme) {
+                                        if ($alarme == $all_alarme->id) {
+                                            if ($all_alarme->critical_level == 1) {
+                                                $display .= "<p style=\"color:#FF7F50\";>" . $all_alarme->name . "<br\>";
+                                            } else {
+                                                $display .= "<p style=\"color:#ff4040\";>" . $all_alarme->name . "<br\>";
+                                            }
+                                        }
+                                    }
+                                }
+                                //echo $current_config;
+                                if ($current_config == 2) {
+
+                                    $analogiqueSeries .= '{x: Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . '), y : ' . $datas->$code . ', myData : \'' . $display . '\'},';
+                                } else {
+                                    $analogiqueSeries .= '{x: Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . '), y : ' . $datas->$code . ', myData : \'\'},';
+                                }
+                            }
+
+
+                            if ($config->type == 2) {
+
+
+
+                                if ($datas->$code == 1 && is_null($date_debut)) {
+                                    $date_debut = $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde;
+                                    $date_fin = null;
+                                    $date_fin_ok = false;
+                                }
+
+                                if ($datas->$code == 0 && !is_null($date_debut) && $date_fin_ok == 0) {
+                                    $date_fin = $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde;
+                                    $date_fin_ok = true;
+                                    $sequenceSeries .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . ",color: '" . $config->hex . "' },";
+                                    $date_debut = null;
+                                }
+                            }
+                        }
+                        if ($config->type == 1) {
+                            $analogiqueSeries .= "]},{";
+                        } else if ($config->type == 2) {
+                            if (is_null($date_fin)) {
+                                $date_fin = $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde;
+                                $sequenceSeries .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . "," . "color: '" . $config->hex . "'}";
+                            }
+                            $sequenceSeries .= "],}, {";
                         }
                     }
+
+
+
 
                     $sequenceSeries2 = rtrim($sequenceSeries, ',}, { ');
                     $analogiqueSeries2 = rtrim($analogiqueSeries, '},{');
-                    echo $analogiqueSeries2;
-//                    echo $sequenceSeries2;
-                    //  dd($analogiqueSeriesData);
+                    //echo $analogiqueSeries2;
+                    //echo $sequenceSeries2;
+                    //  dd($analogiqueSeriesData);  
+                    //echo $plotbands;
 
                     $legendMarginTop = null;
                     $legendY = 0;
@@ -334,9 +371,9 @@
 
 
                             @if($enregistrement->id-1 < 1)
-                            <a href="{{$enregistrement->id-1 > 0 ? route('graphes.show', $enregistrement->id-1) : ""}}" class="btn btn-primary disabled btn-sm" role="button" >Précédent</a>
+                            <a href="{{$enregistrement->id-1 > 0 ? route('graphes.show', $enregistrement->id-1) : ""}}" class="btn btn-primary disabled btn-sm has-spinner" role="button" >Précédent</a>
                             @else 
-                            <a href="{{$enregistrement->id-1 > 0 ? route('graphes.show', $enregistrement->id-1) : ""}}" class="btn btn-primary  btn-sm" role="button">Précédent</a>
+                            <a href="{{$enregistrement->id-1 > 0 ? route('graphes.show', $enregistrement->id-1) : ""}}" class="btn btn-primary  btn-sm has-spinner" role="button">Précédent</a>
                             @endif
 
 
@@ -379,7 +416,7 @@
 
                                                     <input type="hidden" name="comment_id" id="hiddenValue" value="" />
 
-<!--                                                                            <textarea class="form-control" id="comment"></textarea>-->
+    <!--                                                                            <textarea class="form-control" id="comment"></textarea>-->
 
 
                                                     {!! Form::textarea('comment', null, ['class'=>'form-control' , 'rows' => 3, 'id'=>'comment' ,'placeholder' => 'Ecrivez votre commentaire..'])!!}
@@ -398,9 +435,9 @@
 
 
                             @if($enregistrement->id+1 > $enregistrement_last_id)
-                            <a href="{{$enregistrement->id+1 > 0 ? route('graphes.show', $enregistrement->id+1) : ""}}" class="btn btn-primary disabled btn-sm" role="button" >Suivant</a>
+                            <a href="{{$enregistrement->id+1 > 0 ? route('graphes.show', $enregistrement->id+1) : ""}}" class="btn btn-primary disabled btn-sm has-spinner" role="button" >Suivant</a>
                             @else 
-                            <a href="{{$enregistrement->id+1 > 0 ? route('graphes.show', $enregistrement->id+1) : ""}}" class="btn btn-primary  btn-sm"  >Suivant</a>
+                            <a href="{{$enregistrement->id+1 > 0 ? route('graphes.show', $enregistrement->id+1) : ""}}" class="btn btn-primary  btn-sm has-spinner"  >Suivant</a>
                             @endif
 
                             </li>
@@ -448,9 +485,9 @@ $(function () {
      */
     Highcharts.exportCharts = function (charts, options) {
 
-// Merge the options
+        // Merge the options
         options = Highcharts.merge(Highcharts.getOptions().exporting, options);
-// Post to export server
+        // Post to export server
         Highcharts.post(options.url, {
             filename: options.filename || 'chart',
             type: options.type,
@@ -482,15 +519,15 @@ $(function () {
                     if (series.type === 'xrange') {
                         series.color = series.userOptions.color
                     }
-// Handle showInLegend. If the series is linked to another series,
-// defaults to false.
+                    // Handle showInLegend. If the series is linked to another series,
+                    // defaults to false.
                     if (series && H.pick(
                             seriesOptions.showInLegend,
                             !H.defined(seriesOptions.linkedTo) ? undefined : false, true
                             )) {
 
-// Use points or series for the legend item depending on
-// legendType
+                        // Use points or series for the legend item depending on
+                        // legendType
                         allItems = allItems.concat(
                                 series.legendItems ||
                                 (
@@ -528,7 +565,7 @@ $(function () {
             x = evt.clientX - chart.plotLeft - offset.left;
             y = evt.clientY - chart.plotTop - offset.top;
             var xAxis = chart.xAxis[0];
-//remove old plot line and draw new plot line (crosshair) for this chart
+            //remove old plot line and draw new plot line (crosshair) for this chart
             var xAxis1 = chart1.xAxis[0];
             xAxis1.removePlotLine("myPlotLineId");
             xAxis1.addPlotLine({
@@ -538,7 +575,7 @@ $(function () {
                 //dashStyle: 'dash',                   
                 id: "myPlotLineId"
             });
-//remove old crosshair and draw new crosshair on chart2
+            //remove old crosshair and draw new crosshair on chart2
             var xAxis2 = chart2.xAxis[0];
             xAxis2.removePlotLine("myPlotLineId");
             xAxis2.addPlotLine({
@@ -548,7 +585,7 @@ $(function () {
                 //dashStyle: 'dash',                   
                 id: "myPlotLineId"
             });
-//if you have other charts that need to be syncronized - update their crosshair (plot line) in the same way in this function.                   
+            //if you have other charts that need to be syncronized - update their crosshair (plot line) in the same way in this function.                   
         });
     }
 
@@ -587,8 +624,7 @@ $(function () {
                     text: 'Run ' + <?php echo $enregistrement->id ?>
                 },
                 subtitle: {
-                    text: document.ontouchstart === undefined ?
-                            'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
+                    text: "<?php echo $subtitle ?>"
                 },
                 xAxis: {
                     type: 'datetime',
@@ -787,6 +823,47 @@ $(function () {
             var my_id_value = $(event.relatedTarget).data('id');
             $(".modal-body #hiddenValue").val(my_id_value);
         })
+    </script>
+
+    <script>
+
+                (function ($) {
+                    $.fn.buttonLoader = function (action) {
+                        var self = $(this);
+                        if (action == 'start') {
+                            if ($(self).attr("disabled") == "disabled") {
+                                e.preventDefault();
+                            }
+                            $('.has-spinner').attr("disabled", "disabled");
+                            $(self).attr('data-btn-text', $(self).text());
+                            $(self).html('<span class="spinner"><i class="fa fa-spinner fa-spin"></i></span>Chargement');
+                            $(self).addClass('active');
+                        }
+                        if (action == 'stop') {
+                            $(self).html($(self).attr('data-btn-text'));
+                            $(self).removeClass('active');
+                            $('.has-spinner').removeAttr("disabled");
+                        }
+                    }
+                })(jQuery);
+
+        $(document).ready(function () {
+
+            $('.has-spinner').click(function () {
+                var btn = $(this);
+                $(btn).buttonLoader('start');
+                setTimeout(function () {
+                    $(btn).buttonLoader('stop');
+                }, 20000);
+            });
+        });
+        
+        $(function() {
+    $(".preload").fadeOut(2000, function() {
+        $(".content").fadeIn(1000);        
+    });
+});
+
     </script>
 
 

@@ -14,7 +14,7 @@ class DatasStloupSeeder extends Seeder {
         $options = array();
 
         $time = 0;
-        for ($i = 0; $i < 12000; $i++) {
+        for ($i = 0; $i <6000; $i++) {
             $time += 2;
             $options['_date'] = $faker->dateTimeInInterval($startDate = '+ ' . $time . ' seconde', $interval = 'now', null);
             factory(\App\Stloup_pasteurisateur_standardisation_data::class, 1)->create($options);
