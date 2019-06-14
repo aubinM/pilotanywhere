@@ -19,11 +19,11 @@ class GraphsController extends Controller
         //Faire dernier par date debut plus tard
         $enregistrement = Ca_enregistrement::all()->last();
         $enregistrement_last_id = Ca_enregistrement::all()->last()->id;
-        $materiels = Ca_enregistrement::all()->last()->materiel_autonome->Ca_enregistrement_graphe_config;
+        $graphe_config = Ca_enregistrement::all()->last()->materiel_autonome->Ca_enregistrement_graphe_config;
         $all_alarmes = \App\Alarme::all();
         
 
-        return view('layouts.graphes',compact('enregistrement','materiels','enregistrement_last_id','all_alarmes'));
+        return view('layouts.graphes',compact('enregistrement','graphe_config','enregistrement_last_id','all_alarmes'));
     }
 
     /**
@@ -57,11 +57,11 @@ class GraphsController extends Controller
     {
         $enregistrement = Ca_enregistrement::find($id);
         $enregistrement_last_id = Ca_enregistrement::all()->last()->id;
-        $materiels = Ca_enregistrement::all()->last()->materiel_autonome->Ca_enregistrement_graphe_config;
+        $graphe_config = Ca_enregistrement::all()->last()->materiel_autonome->Ca_enregistrement_graphe_config;
         $all_alarmes = \App\Alarme::all();
  
 
-         return view('layouts.graphes', compact('enregistrement','enregistrement_last_id','materiels','all_alarmes'));
+         return view('layouts.graphes', compact('enregistrement','enregistrement_last_id','graphe_config','all_alarmes'));
     }
 
     /**
@@ -90,10 +90,10 @@ class GraphsController extends Controller
         $enregistrement->commentaire = $comment;
         $enregistrement->save();
         $enregistrement_last_id = Ca_enregistrement::all()->last()->id;
-        $materiels = Ca_enregistrement::all()->last()->materiel_autonome->Ca_enregistrement_graphe_config;
+        $graphe_config = Ca_enregistrement::all()->last()->materiel_autonome->Ca_enregistrement_graphe_config;
         $all_alarmes = \App\Alarme::all();
 
-        return view('layouts.graphes', compact('enregistrement','materiels','all_alarmes','enregistrement_last_id'));
+        return view('layouts.graphes', compact('enregistrement','graphe_config','all_alarmes','enregistrement_last_id'));
     }
 
     /**

@@ -31,13 +31,13 @@
     .has-spinner.btn.active .spinner {
         min-width: 20px;
     }
-    
+
     .content {display:none;}
-.preload { width:100px;
-    height: 100px;
-    position: fixed;
-    top: 50%;
-    left: 50%;}
+    .preload { width:100px;
+               height: 100px;
+               position: fixed;
+               top: 50%;
+               left: 50%;}
 
 </style>
 
@@ -46,9 +46,9 @@
 
 
 <body id="page-top">
-    
+
     <div class="preload"><img src="/images/Ellipsis-1s-150px.gif">
-</div>
+    </div>
 
 
     <!-- Page Wrapper -->
@@ -74,6 +74,7 @@
 
 
                     <?php
+                    //Initialisation des variables
                     $current_config = 0;
                     $analogiqueSeries = null;
                     $analogiqueSeriesData = array();
@@ -87,7 +88,6 @@
                     $heure = null;
                     $minute = null;
                     $seconde = null;
-
                     $dates_alarmes = array();
                     $en_attente = array();
                     foreach ($all_alarmes as $alarme) {
@@ -96,9 +96,9 @@
                     }
 
 
-                    
 
 
+                    //Traitement pour le sous titre du graphe analogique
                     $datetime1 = new DateTime($enregistrement->stloup_pasteurisateur_standardisation_data->first()->_date);
                     $datetime2 = new DateTime($enregistrement->stloup_pasteurisateur_standardisation_data->last()->_date);
                     $interval = $datetime1->diff($datetime2);
@@ -106,12 +106,11 @@
                     $subtitle .= " | Fin du run : " . $enregistrement->stloup_pasteurisateur_standardisation_data->last()->_date;
                     $subtitle .= $interval->format(" | Durée du run: %H Heures %I Minutes %S Secondes");
 
-                    //var_dump($enregistrement->stloup_pasteurisateur_standardisation_data);
-
+                    //Pour chaque données de l'enregistrement
                     foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
 
 
-
+                        //Récupération de la date et mise en format 
                         $date = new DateTime($datas->_date);
                         $annee = $date->format('Y');
                         $mois = $date->format('m') - 1;
@@ -119,6 +118,8 @@
                         $heure = $date->format('H');
                         $minute = $date->format('i');
                         $seconde = $date->format('s');
+
+                        //Enlève le 0 pour chaque date car sinon bug dans js console
                         if ($mois[0] == "0") {
                             $mois = substr($mois, 1);
                         }
@@ -134,22 +135,23 @@
                         if ($seconde[0] == "0") {
                             $seconde = substr($seconde, 1);
                         }
+                        //Récupération des alarmes la ligne traité 
                         $alarmes = explode(",", $datas->alarmes);
-                        $display = null;
 
-
-
-
+                        //Pour toutes les alarmes dans la base Alarme
                         foreach ($all_alarmes as $all_alarme) {
 
+                            //Si l'alarme est présente dans la ligne de donnée et que sa date de début est null -> MAJ de sa date de début
                             if (in_array($all_alarme->id, $alarmes) && is_null($dates_alarmes[$all_alarme->id . "debut"])) {
 
                                 $dates_alarmes[$all_alarme->id . "debut"] = 'Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . ')';
                                 //echo"La date debut de l'alarme " . $all_alarme->id . "est  : " . $dates_alarmes[$all_alarme->id . "debut"];
                             }
 
+                            //Si l'alarme n'est pas présente dans la ligne de donnée et que sa date de début n'est pas null -> MAJ de sa date de fin
                             if (!in_array($all_alarme->id, $alarmes) && !is_null($dates_alarmes[$all_alarme->id . "debut"])) {
                                 $dates_alarmes[$all_alarme->id . "fin"] = 'Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . ')';
+                                //Si l'alarme a une criticité de 1 : couleur orange, sinon couleur rouge
                                 if ($all_alarme->critical_level == 1) {
                                     $colorBand = '#FF7F50';
                                     $plotbands .= '{color: \'' . $colorBand . '\',from: ' . $dates_alarmes[$all_alarme->id . "debut"] . ',to: ' . $dates_alarmes[$all_alarme->id . "fin"] . ',},';
@@ -161,7 +163,7 @@
                                 $dates_alarmes[$all_alarme->id . 'debut'] = null;
                             }
 
-
+                            //Si la date de fin est nul est que c'est la dernière ligne de donée et que l'alarme est dans la ligne de donnée -> MAJ de la fin de l'alarme
                             if (is_null($dates_alarmes[$all_alarme->id . 'fin']) && $enregistrement->stloup_pasteurisateur_standardisation_data->last()->is($datas) && in_array($all_alarme->id, $alarmes)) {
                                 $dates_alarmes[$all_alarme->id . 'fin'] = 'Date.UTC(' . $annee . ',' . $mois . ',' . $jour . ',' . $heure . ',' . $minute . ',' . $seconde . ')';
                                 if ($all_alarme->critical_level == 1) {
@@ -176,10 +178,10 @@
                             }
                         }
                     }
-                    $y = 0;
+                    $sequence_placement = 0;
                     $current_config = 0;
 
-                    foreach ($materiels as $config) {
+                    foreach ($graphe_config as $config) {
                         $current_config++;
                         if ($current_config == 1) {
                             foreach ($en_attente as $attente) {
@@ -199,7 +201,7 @@
                             $date_debut = null;
                             $date_fin = null;
                             $date_fin_ok = false;
-                            $y ++;
+                            $sequence_placement ++;
                         }
                         foreach ($enregistrement->stloup_pasteurisateur_standardisation_data as $datas) {
 
@@ -254,7 +256,7 @@
                                 if ($datas->$code == 0 && !is_null($date_debut) && $date_fin_ok == 0) {
                                     $date_fin = $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde;
                                     $date_fin_ok = true;
-                                    $sequenceSeries .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . ",color: '" . $config->hex . "' },";
+                                    $sequenceSeries .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $sequence_placement . ",color: '" . $config->hex . "' },";
                                     $date_debut = null;
                                 }
                             }
@@ -264,7 +266,7 @@
                         } else if ($config->type == 2) {
                             if (is_null($date_fin)) {
                                 $date_fin = $annee . "," . $mois . "," . $jour . "," . $heure . "," . $minute . "," . $seconde;
-                                $sequenceSeries .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $y . "," . "color: '" . $config->hex . "'}";
+                                $sequenceSeries .= "{x: Date.UTC(" . $date_debut . "),x2: Date.UTC(" . $date_fin . "),y: " . $sequence_placement . "," . "color: '" . $config->hex . "'}";
                             }
                             $sequenceSeries .= "],}, {";
                         }
@@ -283,7 +285,7 @@
                     $legendMarginTop = null;
                     $legendY = 0;
 
-                    switch ($y) {
+                    switch ($sequence_placement) {
                         case 1:
                             $legendMarginTop = 125;
                             $legendY = 15;
@@ -857,12 +859,19 @@ $(function () {
                 }, 20000);
             });
         });
-        
-        $(function() {
-    $(".preload").fadeOut(2000, function() {
-        $(".content").fadeIn(1000);        
-    });
-});
+
+        $(function () {
+            $(".preload").fadeOut(2000, function () {
+                $(".content").fadeIn(1000);
+            });
+        });
+
+        $(document.body).on("keydown", this,
+                function (event) {
+                    if (event.keyCode == 116) {
+                        alert('F5 pressed!');
+                    }
+                });
 
     </script>
 
